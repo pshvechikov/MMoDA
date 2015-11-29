@@ -20,9 +20,16 @@
 
 \begin{document}
 %<*includetag>
+
+<<include=FALSE, echo=FALSE>>=
+
+@
+
 \section{Assignment 3.}
 
-\subsection{Selection and building nominal features}
+\subsection{Constructing nominal features}
+
+
 
 %</includetag>
 \end{document}
