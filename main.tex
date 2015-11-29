@@ -48,6 +48,7 @@
 \newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
 
 \usepackage{alltt}
+\usepackage{catchfilebetweentags}
 
 \usepackage[utf8]{inputenc}
 %\usepackage[cp1251]{inputenc}
@@ -109,6 +110,7 @@ Shvechikov Pavel \\
 \input{hw3}
 
 \clearpage
+\ExecuteMetaData[hw4.tex]{includetag}
 
 \bibliographystyle{ugost2008ls}
 \bibliography{references.bib}
