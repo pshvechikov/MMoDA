@@ -1,3 +1,24 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+%\usepackage[cp1251]{inputenc}
+\usepackage[english]{babel}
+\usepackage{indent first}
+\usepackage[top=2 cm, bottom = 2 cm, left = 3 cm, right = 1.5 cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{ mathrsfs }
+\usepackage{subcaption}
+\graphicspath{{images/}}
+\renewcommand{\baselinestretch}{1.1}
+
+\newtheorem*{theorem}{Theorem}
+
+\begin{document}
 
 \section{Assignment 2. Linear regression.}
 
@@ -129,25 +150,41 @@ Recall average relative error (ARE) and coefficient of determination (R$^2$) def
                       {\sum\limits_{i=1}^n (y_i - \bar{y})^2}
 \end{gather*}
 
+<<include=FALSE, cache=TRUE, echo=FALSE>>=
+library(e1071)
+library(car)
+library(lattice)
+library(plyr)
+library(genalg)
+setwd("~/HSE/Mirkin/MMoDA")
+set.seed(123)
+online.news.popularity <- read.csv(file="R-files/new_sample_OnlineNewsPopularity.csv",head=TRUE,sep=",")
+features <- c(3:11,19,27:35)
+
+channel <- online.news.popularity$data_channel_is_lifestyle + 
+  2*online.news.popularity$data_channel_is_entertainment + 3*online.news.popularity$data_channel_is_bus +
+  4*online.news.popularity$data_channel_is_socmed + 5*online.news.popularity$data_channel_is_tech +
+  6*online.news.popularity$data_channel_is_world
+
+data <- subset(online.news.popularity, #shares <= 1e+05 & self_reference_avg_sharess <= 1e+05 & 
+                 shares > 0 & self_reference_avg_sharess > 0) 
+data <- transform(data, num_hrefs = log(num_hrefs), num_self_hrefs = log(num_self_hrefs),
+                  self_reference_avg_sharess = log(self_reference_avg_sharess),
+                  shares = log(shares), n_tokens_content = log(n_tokens_content))
+
+feature1 <- 27 ; feature2 <- 30
+temp <- which(data$data_channel_is_tech == 1)
+model <- lm(data[temp,feature1] ~ data[temp,feature2])
+x.feature <- data[temp,feature2]
+y.feature <- data[temp,feature1]
+summary_regression <- summary(model)
+@
 
 
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{mean}\hlstd{(} \hlkwd{abs}\hlstd{((y.feature} \hlopt{-} \hlstd{model}\hlopt{$}\hlstd{fitted.values)}\hlopt{/}\hlstd{y.feature)} \hlopt{*} \hlnum{100}\hlstd{)} \hlcom{# in %}
-\end{alltt}
-\begin{verbatim}
-## [1] 56.3725
-\end{verbatim}
-\begin{alltt}
-\hlstd{summary_regression}\hlopt{$}\hlstd{r.squared} \hlopt{*} \hlnum{100} \hlcom{# in %}
-\end{alltt}
-\begin{verbatim}
-## [1] 51.41945
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+<<>>=
+mean( abs((y.feature - model$fitted.values)/y.feature) * 100) # in %
+summary_regression$r.squared * 100 # in %
+@
 
 As we can see, considered values are reasonably close. But we should note that ARE is sensitive to the addition of a constant to all of the $y_i$ while R$^2$ is not. That is, we could obtain any arbitrary value of ARE keeping the coefficient of determination constant by adding some constants to $y_i$. 
 
@@ -163,17 +200,13 @@ We will use nature-inspired algorithm to compute the parameters of linear regres
 \end{equation}
 
 We have implemented algorithm similar to the one, which is described in \cite{CCODA_Mirkin}, but we will minimize the function \texttt{delta(coefficients, x, y)}, which looks like
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{delta} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{coefficients}\hlstd{,} \hlkwc{x}\hlstd{,}\hlkwc{y}\hlstd{)\{}
-  \hlstd{a} \hlkwb{=} \hlstd{coefficients[}\hlnum{1}\hlstd{]; b} \hlkwb{=} \hlstd{coefficients[}\hlnum{2}\hlstd{]}
-  \hlstd{yp} \hlkwb{<-} \hlstd{a}\hlopt{*}\hlstd{x} \hlopt{+} \hlstd{b}
-  \hlstd{esq} \hlkwb{<-} \hlkwd{mean}\hlstd{(} \hlkwd{abs}\hlstd{((y} \hlopt{-} \hlstd{yp)}\hlopt{/}\hlstd{y) )}
-\hlstd{\}}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+<<>>=
+delta <- function(coefficients, x,y){
+  a = coefficients[1]; b = coefficients[2]
+  yp <- a*x + b
+  esq <- mean( abs((y - yp)/y) ) 
+} 
+@
 
 We also need the function that compute permissible limits for coefficients. Let look at two values of target $y_i = a \cdot x_i + b$ and $y_j = a \cdot x_j + b$ ($i \neq j$) and express $a$, $b$ in terms of $x$ and $y$:
 \begin{equation*}
@@ -186,30 +219,81 @@ And then we calculate $\max$ and $\min$ of coefficients $a$ and $b$ among all pa
 Using the nature-inspired approach (we have implemented it in R-function nlr) we obtained the following values
 of slope ($a$) and intercept ($b$) and value of relative error:
 
+<<include=FALSE, echo=FALSE, cache=TRUE>>=
+ddr <- function(x,y){
+  ll <- length(x)
+  eps <- 0.05
+  a <- ldply(1:(ll-1), function(i){
+    v <- sapply((i+1):ll, function(j) 
+      ifelse(abs(x[i] - x[j]) > eps, (y[i] - y[j])/(x[i] - x[j]), NA))
+    c(min(v, na.rm = TRUE), max(v, na.rm = TRUE))
+  })
+  b <- ldply(1:(ll-1), function(i){
+    v <- sapply((i+1):ll, function(j) 
+      ifelse(abs(x[i] - x[j]) > eps, (y[j]*x[i] - y[i]*x[j])/(x[i] - x[j]), NA))
+    c(min(v, na.rm = TRUE), max(v, na.rm = TRUE))
+  })
+  
+  list(a.boundaries = c(min(a[,1]), max(a[,2])), 
+       b.boundaries = c(min(b[,1]), max(b[,2])))
+}
+#computing the quality of the approximation
+delta <- function(coef, x,y){
+  a = coef[1]; b = coef[2]
+  yp <- a*x + b
+  #esq <- sum((y - yp)^2)/length(x)
+  esq <- mean( abs((y - yp)/y) ) 
+} 
+
+nlr <- function(x,y){
+  ll <- length(x)
+  bounds <- ddr(x,y) #intervals for coefficients
+  lb <- c(bounds[[1]][1],bounds[[2]][1])
+  rb <- c(bounds[[1]][2],bounds[[2]][2])
+  p = 15 #population size
+  feas <- matrix(c(rep(rb[1] - lb[1],p), rep(rb[2] - lb[2],p)), ncol = 2) * cbind(rnorm(p),rnorm(p)) +
+    matrix(c(rep(lb[1],p), rep(lb[2],p)), ncol = 2)
+  flag = 1; count = 0; iter = 5000; funp = 0
+  vv <- apply(feas, 1, function(d) delta(d, x, y))  
+  funi <- min(vv); ini <- which.min(vv); soli <- feas[ini,]
+  si = 1
+  while (flag == 1){
+    count <- count + 1
+    feas <- feas + cbind(rnorm(p),rnorm(p))
+    feas <- t(apply(feas, 1, function(x) ifelse(x > lb, ifelse(x < rb, x, rb), lb)))
+    vec <- apply(feas, 1, function(d) delta(d, x, y)) 
+    fun <- min(vec); un <- which.min(vec); sol <- feas[un,]
+    wf <- max(vec); wi <- which.max(vec); wun <-feas[wi,]
+    if (wf > funi){
+      feas[wi,] <- soli 
+      vec[wi] <- funi
+    } #changing the worst for the best of the previous generation
+    if (fun < funi) {
+      soli <- sol; funi <- fun
+    }
+    if (count >= iter) { flag = 0 }
+    residvar <- funi/var(y)
+    if (count %% 500 == 0){
+      # print(soli)
+      # print(residvar)
+    }
+  }
+  a <- soli[1]; b <- soli[2]
+  c(a,b)
+}
+
+@
 
 
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# The regression model: y.feature = a * x.feature + b}
-\hlcom{# Coefficients of slope and intercept respectively:}
-\hlstd{model.nlr} \hlkwb{<-} \hlkwd{nlr}\hlstd{(x.feature, y.feature)}
-\hlstd{model.nlr}
-\end{alltt}
-\begin{verbatim}
-## [1]  0.3610875 -0.1570541
-\end{verbatim}
-\begin{alltt}
-\hlcom{# Value of relative error:}
-\hlstd{eps.nlr} \hlkwb{<-} \hlstd{y.feature} \hlopt{-} \hlstd{model.nlr[}\hlnum{1}\hlstd{]}\hlopt{*}\hlstd{x.feature} \hlopt{-} \hlstd{model.nlr[}\hlnum{2}\hlstd{]}
-\hlkwd{mean}\hlstd{(} \hlkwd{abs}\hlstd{(eps.nlr} \hlopt{/} \hlstd{y.feature) )} \hlopt{*} \hlnum{100}
-\end{alltt}
-\begin{verbatim}
-## [1] 50.04851
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+<<cache = TRUE>>=
+# The regression model: y.feature = a * x.feature + b
+# Coefficients of slope and intercept respectively:
+model.nlr <- nlr(x.feature, y.feature) 
+model.nlr
+# Value of relative error:
+eps.nlr <- y.feature - model.nlr[1]*x.feature - model.nlr[2]
+mean( abs(eps.nlr / y.feature) ) * 100
+@
 
 Comparing the values of two relative errors, we can see that nature-inspired approach reduce its value by a few percent. 
 %
@@ -275,42 +359,21 @@ Comparing the values of two relative errors, we can see that nature-inspired app
 
 In R-language there is a package \texttt{genalg} with function \texttt{rbga} that implement this approach. The results obtained with function \texttt{rbga} are very close to the results described above:
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# The regression model: y.feature = a * x.feature + b}
-\hlcom{# Calculate the permissible limits for a and b }
-\hlstd{bound} \hlkwb{<-} \hlkwd{ddr}\hlstd{(x.feature, y.feature)}
-\hlstd{bounds.min} \hlkwb{<-} \hlkwd{c}\hlstd{(bound[[}\hlnum{1}\hlstd{]][}\hlnum{1}\hlstd{],bound[[}\hlnum{2}\hlstd{]][}\hlnum{1}\hlstd{])} \hlcom{# (a.min, b.min) }
-\hlstd{bounds.max} \hlkwb{<-} \hlkwd{c}\hlstd{(bound[[}\hlnum{1}\hlstd{]][}\hlnum{2}\hlstd{],bound[[}\hlnum{2}\hlstd{]][}\hlnum{2}\hlstd{])} \hlcom{# (a.max, b.max)}
+<<cache=TRUE>>=
+# The regression model: y.feature = a * x.feature + b
+# Calculate the permissible limits for a and b 
+bound <- ddr(x.feature, y.feature)
+bounds.min <- c(bound[[1]][1],bound[[2]][1]) # (a.min, b.min) 
+bounds.max <- c(bound[[1]][2],bound[[2]][2]) # (a.max, b.max)
 
-\hlstd{rbga.res} \hlkwb{<-} \hlkwd{rbga}\hlstd{(bounds.min, bounds.max,} \hlkwc{popSize} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{iters} \hlstd{=} \hlnum{5000}\hlstd{,}
-   \hlkwc{evalFunc} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{coefs}\hlstd{)} \hlkwd{delta}\hlstd{(coefs, x.feature, y.feature))}
+rbga.res <- rbga(bounds.min, bounds.max, popSize = 30, iters = 5000,
+   evalFunc = function(coefs) delta(coefs, x.feature, y.feature))
 
-\hlcom{# Results (we need to take a look at "Best Solution")}
-\hlkwd{cat}\hlstd{(}\hlkwd{summary}\hlstd{(rbga.res))}
-\end{alltt}
-\begin{verbatim}
-## GA Settings
-##   Type                  = floats chromosome
-##   Population size       = 30
-##   Number of Generations = 5000
-##   Elitism               = 6
-##   Mutation Chance       = 0.333333333333333
-## 
-## Search Domain
-##   Var 1 = [-6.674999999946,6.47188552188199]
-##   Var 2 = [-5.27885519411197,5.97499999995278]
-## 
-## GA Results
-##   Best Solution : 0.348751377798375 -0.14645601290741
-\end{verbatim}
-\begin{alltt}
-\hlcom{# Value of relative error:}
-\hlkwd{delta}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0.3477}\hlstd{,} \hlopt{-}\hlnum{0.1463}\hlstd{), x.feature, y.feature)} \hlopt{*} \hlnum{100}
-\end{alltt}
-\begin{verbatim}
-## [1] 49.92909
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+# Results (we need to take a look at "Best Solution")
+cat(summary(rbga.res))
+
+# Value of relative error:
+delta(c(0.3477, -0.1463), x.feature, y.feature) * 100
+@
+
+\end{document}

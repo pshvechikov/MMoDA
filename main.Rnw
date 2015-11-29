@@ -1,0 +1,67 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+%\usepackage[cp1251]{inputenc}
+\usepackage[english]{babel}
+\usepackage{indent first}
+\usepackage[top=2 cm, bottom = 2 cm, left = 3 cm, right = 1.5 cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{ mathrsfs }
+\usepackage{subcaption}
+\graphicspath{{images/}}
+\renewcommand{\baselinestretch}{1.1}
+
+\newtheorem*{theorem}{Theorem}
+
+\begin{document}
+
+\begin{center}
+Federal State Autonomous Educational Institution
+of High Professional Education
+National Research University «Higher School of Economics»
+\end{center}
+
+\begin{center}
+Faculty of Computer Science
+School of Data Analysis and Artificial Intelligence
+\end{center}
+
+\vspace*{3 cm}
+
+\begin{center} \huge
+Report on the course \\ 
+''Modern Methods of Data Analysis''.
+\end{center}
+
+
+\vspace*{1.5 cm}
+
+\begin{center} \large
+«Data Sciences» Master program \\
+Lecturer: Boris G. Mirkin.
+\end{center}
+
+
+\begin{center} \large
+\textbf{Authors:}\\
+Cherny Artem \\
+Ivanova Polina \\
+Shvechikov Pavel \\
+\end{center}
+ 
+\input{hw2}
+
+\newpage
+\input{hw3}
+
+\clearpage
+
+\bibliographystyle{ugost2008ls}
+\bibliography{references.bib}
+
+\end{document}
