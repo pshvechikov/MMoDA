@@ -1,6 +1,8 @@
 library(e1071)
 library(lattice)
 library(plyr)
+library(xtable)
+
 set.seed(123)
 online.news.popularity <- read.csv(file="new_sample_OnlineNewsPopularity.csv",head=TRUE,sep=",")
 
@@ -79,6 +81,7 @@ get_pretty_table_chi2 <- function(v1,v2) {
   xtable(res)
 }
 
+data <- data[sample(1:10000, size = 1000, replace = FALSE),]
 get_pretty_table_chi2(data$channel, data$timegroup)
 get_pretty_table_chi2(data$channel, data$weekday)
 
@@ -90,5 +93,5 @@ get_pretty_table_chi2(data$channel, data$weekday)
 chisq.test(table(data$channel, data$weekday)*1.0)
 
 # For size = 16000 we get p-value = 0.01
-chisq.test(table(data$weekday, data$timegroup)*1.0)
+chisq.test(table(data$channel, data$timegroup))
 

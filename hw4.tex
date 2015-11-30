@@ -237,5 +237,14 @@ Sum & (0.001) & (0.001) & (0.002) & (0.001) & (0.001) & (0.003) & (0.005) &  (0.
 \caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{weekday}} \label{tbl:quet_table_ch_week}
 \end{table}
 
+\subsection{Sufficient sample size for significant result}
+
+Supposing the probabilities $p_{i+}$, $p_{+j}$, $p_{ij}$ are constant and sample size $n$ is varying, we can get $\chi^2$-statistics from
+\begin{gather*}
+nX^2 = \sum\limits_{k=1}^K \sum\limits_{l=1}^L \frac{(p_{kl} - p_{k+}p_{+l})^2}{p_{k+}p_{+l}} \overset{n \to \infty}{\Rightarrow} \chi^2((K-1)(L-1))
+\end{gather*} 
+
+We know $X^2$ and $L$ for pairs \texttt{channel}--\texttt{timegroup} and \texttt{channel}--\texttt{weekday}, so, we can get sufficient $K$ for significant results.
+
 %</includetag>
 \end{document}
