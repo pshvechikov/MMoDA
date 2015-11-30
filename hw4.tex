@@ -71,13 +71,13 @@
 %<*includetag>
 \section{Assignment 4}
 \subsection{Selection and building nominal features}
-In our dataset we have several binary features, such as weekdays (\texttt{weekday\_is\_monday}, \texttt{weekday\_is\_tuesday} and so on) and belonging to one of the channels (\texttt{data\_channel\_is\_lifestyle}, \texttt{data\_channel\_is\_entertainment} and so on). Therefore we built two nominal features:
+In our dataset we have several binary features, such as weekdays (\texttt{weekday\_is\_monday}, \texttt{weekday\_is\_tuesday} and so on) and  belonging to one of the channels (\texttt{data\_channel\_is\_lifestyle}, \texttt{data\_channel\_is\_entertainment} and so on). Therefore we built two nominal features:
 \begin{itemize}
 \item channel: integer values ranging between 1 and 6 ('Lifestyle', 'Entertainment', 'Business', 'Social Media', 'Tech', 'World')
 \item weekday: integer values ranging between 1 and 7 
 \end{itemize}
 
-To obtain the third nominal feature we divide into four parts the feature \texttt{timedelta}: days between the article publication and the dataset acquisition.
+To obtain the third nominal feature we divide the feature \texttt{timedelta} into four parts : days between the article publication and the dataset acquisition.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}  
@@ -86,10 +86,10 @@ To obtain the third nominal feature we divide into four parts the feature \textt
 \end{kframe}
 \end{knitrout} 
 
-And we break range of values of \texttt{timedelta} into intervals: $(7.28,189]$, $(189,370]$, $(370,550]$, $(550,732]$
+And we break range of values of \texttt{timedelta} into intervals of approximate equal size: $(7.28,189]$, $(189,370]$, $(370,550]$, $(550,732]$
 
 \subsection{Contingency tables over features}
-Conditional frequency tables over introdused nominal fetures are obtained with R-function \texttt{table} as showned below and results are presented at Tables \ref{tbl:cont_table_ch_timed} -- \ref{tbl:cont_table_timed_week}.
+Conditional frequency tables over introduced nominal fetures are obtained with R-function \texttt{table} as is shown below. Results are presented in Tables \ref{tbl:cont_table_ch_timed} -- \ref{tbl:cont_table_ch_week}.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}  
@@ -103,7 +103,7 @@ table(data$channel, data$weekday)
 \begin{center}
 \small
 \begin{minipage}[h]{0.45\linewidth}
-\caption{Conditional frequency table over \texttt{channel} and \texttt{timegroup}} \label{tbl:cont_table_ch_timed}
+\caption{Cross classification of the \texttt{channel} with \texttt{timegroup}} \label{tbl:cont_table_ch_timed}
 \begin{tabular}{|c|c|c|c|c|} 
  \hline
   &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
@@ -118,7 +118,7 @@ table(data$channel, data$weekday)
 \end{minipage}
 \hfill 
 \begin{minipage}[h]{0.45\linewidth}
-\caption{Conditional frequency table over \texttt{channel} and \texttt{weekday}} \label{tbl:cont_table_ch_week}
+\caption{Cross classification of the \texttt{channel} with \texttt{weekday}} \label{tbl:cont_table_ch_week}
 \begin{tabular}{|c|c|c|c|c|c|c|c|} 
  \hline
      &1 & 2 & 3 & 4 & 5 & 6 & 7 \\ \hline
@@ -134,11 +134,54 @@ table(data$channel, data$weekday)
 \end{center}
 \end{table}
 
-Quetelet relative index tables over our nominal fetures we obtain with the function:
+
+\begin{table}[h]
+\begin{center}
+\caption{Conditional frequency table over \texttt{channel} and \texttt{timegroup}}
+\label{tbl:cont_table_ch_timed_freq}
+\begin{tabular}{|c|c|c|c|c|c|} 
+\hline
+& (7.28,189] &(189,370] &(370,550] &(550,732] &   Sum \\ \hline
+0   &       4.12 &     3.27 &     3.61 &     3.81 & 14.81 \\ \hline
+1   &       1.20 &     0.93 &     1.30 &     1.83 &  5.26 \\ \hline
+2   &       5.73 &     4.73 &     3.41 &     3.48 & 17.35 \\ \hline
+3   &       3.92 &     4.08 &     4.10 &     4.46 & 16.56 \\ \hline
+4   &       0.81 &     1.54 &     1.63 &     1.92 &  5.90 \\ \hline
+5   &       4.01 &     4.69 &     4.91 &     4.92 & 18.53 \\ \hline
+6   &       9.01 &     5.64 &     3.73 &     3.21 & 21.59 \\ \hline
+Sum &      28.80 &    24.88 &    22.69 &    23.63 &100.00 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[h]
+\begin{center}
+\caption{Conditional frequency table over \texttt{channel} and \texttt{weekday}} 
+\label{tbl:cont_table_ch_week_freq}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|} 
+\hline
+&    1 &     2 &     3 &     4 &     5  &    6 &     7 &   Sum \\ \hline
+0   & 2.24 &  2.56 &  2.53 &  2.57 &  2.38  & 1.12 &  1.41 & 14.81 \\ \hline
+1   & 0.80 &  0.95 &  0.92 &  0.85 &  0.69  & 0.46 &  0.59 &  5.26 \\ \hline
+2   & 3.17 &  3.32 &  3.11 &  2.87 &  2.41  & 0.95 &  1.52 & 17.35 \\ \hline
+3   & 2.77 &  2.93 &  3.71 &  3.19 &  2.45  & 0.57 &  0.94 & 16.56 \\ \hline
+4   & 0.88 &  1.16 &  1.05 &  1.15 &  0.88  & 0.44 &  0.34 &  5.90 \\ \hline
+5   & 3.16 &  3.72 &  3.58 &  3.44 &  2.44  & 1.25 &  0.94 & 18.53 \\ \hline
+6   & 3.60 &  3.79 &  3.99 &  3.92 &  3.42  & 1.36 &  1.51 & 21.59 \\ \hline
+Sum &16.62 & 18.43 & 18.89 & 17.99 & 14.67  & 6.15 &  7.25 &100.00 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+The same  data converted to relative frequencies by relating them to the total number of entities are presented in Tables \ref{tbl:cont_table_ch_timed_freq} -- \ref{tbl:cont_table_ch_week_freq}. 
+
+ 
+
+Quetelet relative index tables over our nominal fetures we obtain as a result of the following function:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}  
-getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) {
+getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) \{
   size \hlkwb{<-} length(v1)
   cont.table  \hlkwb{<-} table(v1, v2)
   row.sums  \hlkwb{<-} rowSums(cont.table)
@@ -149,7 +192,7 @@ getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) {
   list(Quetelet = norm.cont.table / (norm.row.sums %*% t(norm.col.sums)) - 1,
        PearsonIndexMatrix = (-norm.row.sums %*% t(norm.col.sums) + norm.cont.table) /
           sqrt(norm.row.sums %*% t(norm.col.sums)))
-}
+\}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
