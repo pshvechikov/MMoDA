@@ -1,79 +1,10 @@
-\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
-%% maxwidth is the original width if it is less than linewidth
-%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textsf{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
-
-\usepackage[utf8]{inputenc}
-%\usepackage[cp1251]{inputenc}
-\usepackage[english]{babel}
-\usepackage{indent first}
-\usepackage[top=2 cm, bottom = 2 cm, left = 3 cm, right = 1.5 cm]{geometry}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage{graphicx}
-\usepackage{wrapfig}
-\usepackage{listings}
-\usepackage{ mathrsfs }
-\usepackage{subcaption}
-\graphicspath{{images/}}
-\renewcommand{\baselinestretch}{1.1}
-
-\newtheorem*{theorem}{Theorem}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\begin{document}
 %<*includetag>
+
 \section{Assignment 4}
 \subsection{Selection and building nominal features}
 In our dataset we have several binary features, such as weekdays (\texttt{weekday\_is\_monday}, \texttt{weekday\_is\_tuesday} and so on) and  belonging to one of the channels (\texttt{data\_channel\_is\_lifestyle}, \texttt{data\_channel\_is\_entertainment} and so on). Therefore we built two nominal features:
 \begin{itemize}
-\item channel: integer values ranging between 1 and 6 ('Lifestyle', 'Entertainment', 'Business', 'Social Media', 'Tech', 'World')
+\item channel: integer values ranging between 0 and 6 ('No channel', 'Lifestyle', 'Entertainment', 'Business', 'Social Media', 'Tech', 'World')
 \item weekday: integer values ranging between 1 and 7 
 \end{itemize}
 
@@ -234,25 +165,26 @@ As could be clearly seen, it is pretty cumbersome to make any conclusion about d
 We choose \texttt{channel}  as the common feature for comparison with two other features. Motivation for such choice is as follows, there is no much sense in cross-classification subgroups of time passed from the article publishing till dataset acquisition   and the day of the week it was published. This point of veiw is also supported by the Table \ref{tbl:cont_table_week_timegroup_freq}, wich reveals no particular irregularities of the data, except the number of publication in a particular day of week.
 
 
-\clearpage
+% \clearpage
  
 
 Quetelet relative index tables over our nominal fetures we obtain as a result of the following function:
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}  
-getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) \{
-  size \hlkwb{<-} length(v1)
-  cont.table  \hlkwb{<-} table(v1, v2)
-  row.sums  \hlkwb{<-} rowSums(cont.table)
-  col.sums  \hlkwb{<-} colSums(cont.table)
-  norm.cont.table  \hlkwb{<-}  cont.table / size
-  norm.row.sums  \hlkwb{<-} row.sums / size
-  norm.col.sums  \hlkwb{<-} col.sums / size
-  list(Quetelet = norm.cont.table / (norm.row.sums %*% t(norm.col.sums)) - 1,
-       PearsonIndexMatrix = (-norm.row.sums %*% t(norm.col.sums) + norm.cont.table) /
-          sqrt(norm.row.sums %*% t(norm.col.sums)))
-\}
+\begin{alltt}
+\hlstd{getQueteletIndex} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{v1}\hlstd{,} \hlkwc{v2}\hlstd{) \{}
+  \hlstd{size} \hlkwb{<-} \hlkwd{length}\hlstd{(v1)}
+  \hlstd{cont.table}  \hlkwb{<-} \hlkwd{table}\hlstd{(v1, v2)}
+  \hlstd{row.sums}  \hlkwb{<-} \hlkwd{rowSums}\hlstd{(cont.table)}
+  \hlstd{col.sums}  \hlkwb{<-} \hlkwd{colSums}\hlstd{(cont.table)}
+  \hlstd{norm.cont.table}  \hlkwb{<-}  \hlstd{cont.table} \hlopt{/} \hlstd{size}
+  \hlstd{norm.row.sums}  \hlkwb{<-} \hlstd{row.sums} \hlopt{/} \hlstd{size}
+  \hlstd{norm.col.sums}  \hlkwb{<-} \hlstd{col.sums} \hlopt{/} \hlstd{size}
+  \hlkwd{list}\hlstd{(}\hlkwc{QueteletIndexMatrix} \hlstd{= norm.cont.table} \hlopt{/} \hlstd{(norm.row.sums} \hlopt{%*%} \hlkwd{t}\hlstd{(norm.col.sums))} \hlopt{-} \hlnum{1}\hlstd{,}
+       \hlkwc{PearsonIndexMatrix} \hlstd{= (}\hlopt{-}\hlstd{norm.row.sums}\hlopt{%*%}\hlkwd{t}\hlstd{(norm.col.sums)} \hlopt{+} \hlstd{norm.cont.table )} \hlopt{/}
+                             \hlkwd{sqrt}\hlstd{(norm.row.sums}\hlopt{%*%}\hlkwd{t}\hlstd{(norm.col.sums)))}
+\hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -293,14 +225,19 @@ The results (in percent) are  presented in Tables \ref{tbl:quet_table_ch_timed},
 \end{center}
 \end{table}
 
-As we can see from the Table \ref{tbl:quet_table_ch_timed}, \texttt{timegroup} is dependent with \texttt{channel} in some values. For example, we observe rather big Quetelet relative index between \textsf{Entartanment channel} and \textsf{4th time-group}. \footnote{This could be explained with the hypothesis of some major entertainment event, which happened quite a long time before the dataset acquisition was occured. }
+As we can see from the Table \ref{tbl:quet_table_ch_timed}, \texttt{timegroup} is dependent with \texttt{channel} in some values. For example, we observe rather big Quetelet relative index between \textsf{Lifestyle channel} and \textsf{4th time-group}. \footnote{This could be explained with the hypothesis of some major classical lifestyle articles, which were written a long time before the dataset acquisition was occured. }
 In addition, we can't reject a dependence between \textsf{World channel} and \textsf{1st time-group}. It can be caused by not random sampling or by some extra-ordinary events with great response in the world.
 
-Table \ref{tbl:quet_table_ch_week} provides us less surprising and slightly more predictable results: all channels are almost independent with weekdays except of \textsf{Entartanment channel} and \textsf{Weekend} pair. This observation is easy to interpret: users visit Mashable at the weekend -- period when they have more free time (compared to workdays) to amuse themselves. 
+Table \ref{tbl:quet_table_ch_week} provides us less surprising and slightly more predictable results: all channels are almost independent with weekdays except of \textsf{Lifestyle channel} and \textsf{Weekend} pair. This observation is easy to interpret: users visit Mashable at the weekend -- period when they have more free time (compared to workdays) to dedicate time to themselves.
 
 
 \subsection{$\chi^2$--summary Quetelet index}
 
+We have calculated and visualize $\chi^2$--summary according to \cite{CCODA_Mirkin}: we put Pearson's indices outside the parenthesis and it's squared value inside the parenthesis. Such presentation provides mush more information than usual $\chi^2$-statistics.
+
+As we can see from the Table \ref{tbl:chi2_table_ch_timegroup}, the largest contribution (almost 30\%!) belongs to dependence between \textsf{World channel} and \textsf{1st time-group} (most recent articles). We can sayt that dependence is positive because the Peason's index is positive.
+
+In contrast, in Table \ref{tbl:chi2_table_ch_timegroup} all values are approximately equal to each other, there is no outstanding dependences. So, our first suggestion about dependence between \textsf{Lifestyle} and \textsf{Weekend} is not confirmed.
 
 \begin{table}[ht]
 \centering
@@ -317,7 +254,7 @@ Table \ref{tbl:quet_table_ch_week} provides us less surprising and slightly more
 6 & 0.11197 (0.013) & 0.01158 (0.00013) & -0.05281 (0.00279) & -0.08375 (0.007)& (0.0225)  \\ \hline
 Sum & (0.0237)      & (0.002)			& (0.006)			 & (0.0144)		   & (0.04624) \\ \hline
 \end{tabular}
-\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{timegroup}} \label{tbl:quet_table_ch_week}
+\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{timegroup}} \label{tbl:chi2_table_ch_timegroup}
 \end{table}
 
 \begin{table}[ht]
@@ -337,7 +274,7 @@ Sum & (0.0237)      & (0.002)			& (0.006)			 & (0.0144)		   & (0.04624) \\ \hlin
 Sum & (0.001) & (0.001) & (0.002) & (0.001) & (0.001) & (0.003) & (0.005) &  (0.0124)\\ 
    \hline
 \end{tabular}
-\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{weekday}} \label{tbl:quet_table_ch_week}
+\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{weekday}} \label{tbl:chi2_table_ch_week}
 \end{table}
 
 \subsection{Sufficient sample size for significant result}
@@ -349,5 +286,28 @@ nX^2 = \sum\limits_{k=1}^K \sum\limits_{l=1}^L \frac{(p_{kl} - p_{k+}p_{+l})^2}{
 
 We know $X^2$ and $L$ for pairs \texttt{channel}--\texttt{timegroup} and \texttt{channel}--\texttt{weekday}, so, we can get sufficient $K$ for significant results.
 
+
+For the pair \texttt{channel}--\texttt{timegroup} and confidence level $0.95$ we have the following equation:
+\begin{gather*}
+n \cdot 0.04624 = \left(\chi^2_{(K-1)(L-1)}\right)^{-1} (0.95) = \left(\chi^2_{6 \cdot 3}\right)^{-1} (0.95) = 28.8693 \\
+n_{0.95} \approx 625
+\end{gather*}
+By similar arguments we obtain sufficient number of observation for confidence level $0.99$:
+\begin{gather*}
+n \cdot 0.04624 = \left(\chi^2_{(K-1)(L-1)}\right)^{-1} (0.99) = \left(\chi^2_{6 \cdot 3}\right)^{-1} (0.99) = 34.80531 \\
+n_{0.99} \approx 753
+\end{gather*}
+
+For the second pair \texttt{channel}--\texttt{weekday} we know $K = 7, L=7$. As in the previous case, we solve two equations:
+\begin{gather*}
+n \cdot 0.0124 = \left(\chi^2_{(K-1)(L-1)}\right)^{-1} (0.95) = \left(\chi^2_{6 \cdot 6}\right)^{-1} (0.95) = 50.99846 \\
+n_{0.95} \approx 4113
+\end{gather*}
+By similar arguments we obtain sufficient number of observation for confidence level $0.99$:
+\begin{gather*}
+n \cdot 0.0124 = \left(\chi^2_{(K-1)(L-1)}\right)^{-1} (0.99) = \left(\chi^2_{6 \cdot 6}\right)^{-1} (0.99) = 58.61921 \\
+n_{0.99} \approx 4727.356
+\end{gather*}
+
+
 %</includetag>
-\end{document}
