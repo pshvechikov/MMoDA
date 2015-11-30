@@ -14,7 +14,7 @@
 \definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
 \newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
 \newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textsf{#1}}}%
 \newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
 \newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
 \newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
@@ -81,7 +81,7 @@ To obtain the third nominal feature we divide into four parts the feature \textt
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}  
-\hlstd{timegroup} \hlkwb{<-} \hlkwa{cut}\hlstd{(data$timedelta, breaks = 4}
+\hlstd{timegroup} \hlkwb{<-} \hlkwa{cut}\hlstd{(data$timedelta, breaks = 4})
 \end{alltt}
 \end{kframe}
 \end{knitrout} 
@@ -95,14 +95,14 @@ Conditional frequency tables over introdused nominal fetures are obtained with R
 \begin{alltt}  
 table(data$channel, data$timegroup)
 table(data$channel, data$weekday)
-table(data$weekday, data$timegroup)
 \end{alltt}
 \end{kframe}
 \end{knitrout} 
 
-\begin{figure}[h]
+\begin{table}[h]
 \begin{center}
-\begin{minipage}[h]{0.4\linewidth}
+\small
+\begin{minipage}[h]{0.45\linewidth}
 \caption{Conditional frequency table over \texttt{channel} and \texttt{timegroup}} \label{tbl:cont_table_ch_timed}
 \begin{tabular}{|c|c|c|c|c|} 
  \hline
@@ -117,7 +117,7 @@ table(data$weekday, data$timegroup)
 \end{tabular}
 \end{minipage}
 \hfill 
-\begin{minipage}[h]{0.4\linewidth}
+\begin{minipage}[h]{0.45\linewidth}
 \caption{Conditional frequency table over \texttt{channel} and \texttt{weekday}} \label{tbl:cont_table_ch_week}
 \begin{tabular}{|c|c|c|c|c|c|c|c|} 
  \hline
@@ -132,26 +132,7 @@ table(data$weekday, data$timegroup)
 \end{tabular}
 \end{minipage}
 \end{center}
-\end{figure}
-
-\begin{figure}[h]
-\begin{center}
-\begin{minipage}[h]{0.4\linewidth}
-\caption{Conditional frequency table over \texttt{weekday} and \texttt{timegroup}} \label{tbl:cont_table_timed_week}
-\begin{tabular}{|c|c|c|c|c|} 
- \hline
-  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
-  1&        492&       428  &     365   &    377 \\ \hline
-  2 &       564&       458  &     398   &    423 \\ \hline
-  3  &      513&       458  &     456   &    462 \\ \hline
-  4   &     495&       436  &     431   &    437 \\ \hline
-  5    &    444&       358  &     304   &    361 \\ \hline
-  6   &     181&       150  &     144   &    140 \\ \hline
-  7  &      191&       200  &     171   &    163 \\ \hline
-\end{tabular}
-\end{minipage}
-\end{center}
-\end{figure}
+\end{table}
 
 Quetelet relative index tables over our nominal fetures we obtain with the function:
 \begin{knitrout}
@@ -165,15 +146,17 @@ getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) {
   norm.cont.table  \hlkwb{<-}  cont.table / size
   norm.row.sums  \hlkwb{<-} row.sums / size
   norm.col.sums  \hlkwb{<-} col.sums / size
-  list(Quetelet = norm.cont.table/(norm.row.sums%*% t(norm.col.sums)) - 1,
-       PearsonIndexMatrix = (-norm.row.sums%*%t(norm.col.sums)  + norm.cont.table )/sqrt(norm.row.sums%*%t(norm.col.sums)))
+  list(Quetelet = norm.cont.table / (norm.row.sums %*% t(norm.col.sums)) - 1,
+       PearsonIndexMatrix = (-norm.row.sums %*% t(norm.col.sums) + norm.cont.table) /
+          sqrt(norm.row.sums %*% t(norm.col.sums)))
 }
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
-The results (in percent) are  presented at Tables . 
-\begin{figure}[h]
+The results (in percent) are  presented at Tables \ref{tbl:quet_table_ch_timed}, \ref{tbl:quet_table_ch_week}. 
+\begin{table}[h]
+\footnotesize
 \begin{center}
 \begin{minipage}[h]{0.4\linewidth}
 \caption{Quetelet relative index table over \texttt{channel} and \texttt{timegroup}} \label{tbl:quet_table_ch_timed}
@@ -205,26 +188,54 @@ The results (in percent) are  presented at Tables .
 \end{tabular}
 \end{minipage}
 \end{center}
-\end{figure}
+\end{table}
 
-\begin{figure}[h]
-\begin{center}
-\begin{minipage}[h]{0.4\linewidth}
-\caption{Quetelet relative index table over \texttt{weekday} and \texttt{timegroup}} \label{tbl:quet_table_timed_week}
-\begin{tabular}{|c|c|c|c|c|} 
- \hline
-  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
-  1 &      2.79 &     3.51  &   -3.21    & -4.01 \\ \hline
-  2&\textbf{6.26}&   -0.12  &   -4.82    & -2.87 \\ \hline
-  3 &     -5.70  &   -2.55&\textbf{6.39} &  3.50 \\ \hline
-  4 &     -4.46  &   -2.59  &    5.59    &  2.80 \\ \hline
-  5 &      5.09  &   -1.92  &   -8.67    &\textbf{4.14} \\ \hline
-  6 &      2.19  &   -1.97   &   3.19    & -3.66 \\ \hline
-  7 &   -8.52&\textbf{10.88}&    3.95    & -4.86 \\ \hline
+As we can see from the Table \ref{tbl:quet_table_ch_timed}, \texttt{timegroup} is dependent with \texttt{channel} in some values. For example, we observe rather big Quetelet relative index between \textsf{Entartanment channel} and \textsf{4th time-group}. \footnote{WHY????}
+In addition, we can't reject a dependence between \textsf{World channel} and \textsf{1st time-group}. It can be caused by not random sampling or by some extra-ordinary events with great response in the world.
+
+Table \ref{tbl:quet_table_ch_week} provides us less surprising and more predictable results: all channels are almost independent with weekdays inspite of \textsf{Entartanment channel} and \textsf{Weekend}. This result is easy to understand: users visit Mashable at weekends to amuse themselves. \footnote{To fix.}
+
+
+\subsection{$\chi^2$--summary Quetelet index}
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+  \hline
+ &(7.28,189] & (189,370] & (370,550] & (550,732] & Sum \\ 
+  \hline
+0 & -0.007 (0.00005) & -0.02161 (0.0004) & 0.01362 (0.0002) & 0.01659 (0.0003) & (0.00098) \\  \hline
+1 & -0.02558 (0.0006) & -0.03310 (0.001) & 0.00975 (0.0001) & 0.05266 (0.003)  & (0.0046)  \\ \hline
+2 & 0.03280 (0.001) & 0.01989 (0.0004) & -0.02655 (0.0007) & -0.03061 (0.0009) & (0.003)   \\ \hline
+3 & -0.03889 (0.0015) & -0.00198 (0) & 0.01767 (0.0003) & 0.02765 (0.0008)     & (0.0026)  \\ \hline
+4 & -0.06821 (0.0047) & 0.00595  (0.00004) & 0.02518 (0.0006) & 0.04453 (0.002)& (0.0073) \\ \hline
+5 & -0.05743 (0.0033) & 0.00371 (0.00001) & 0.03441 (0.0012) & 0.02587 (0.0006)& (0.005)  \\ \hline
+6 & 0.11197 (0.013) & 0.01158 (0.00013) & -0.05281 (0.00279) & -0.08375 (0.007)& (0.0225)  \\ \hline
+Sum & (0.0237)      & (0.002)			& (0.006)			 & (0.0144)		   & (0.04624) \\ \hline
 \end{tabular}
-\end{minipage}
-\end{center}
-\end{figure}
+\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{timegroup}} \label{tbl:quet_table_ch_week}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+  \hline
+ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & Sum \\ 
+  \hline
+0 & -0.014  (0) & -0.01  (0) & -0.016  (0) & -0.006  (0) & 0.014  (0) & 0.022  (0) & 0.032  (0.001) & (0.002) \\  \hline
+1 & -0.008  (0) & -0.002  (0) & -0.007  (0) & -0.01  (0) & -0.009  (0) & 0.024  (0.001) & 0.034  (0.001) & (0.002) \\  \hline
+2 & 0.017  (0) & 0.007  (0) & -0.009  (0) & -0.014  (0) & -0.008  (0) & -0.011  (0) & 0.023  (0.001) & (0.001) \\  \hline
+3 & 0.001  (0) & -0.007  (0) & 0.033  (0.001) & 0.012  (0) & 0.001  (0) & -0.044  (0.002) & -0.024  (0.001) & (0.004) \\  \hline
+4 & -0.01  (0) & 0.007  (0) & -0.006  (0) & 0.009  (0) & 0.002  (0) & 0.013  (0) & -0.013  (0) & (0.001) \\  \hline
+5 & 0.005  (0) & 0.017  (0) & 0.004  (0) & 0.006  (0) & -0.017  (0) & 0.01  (0) & -0.035  (0.001) & (0.002) \\  \hline
+6 & 0.001  (0) & -0.009  (0) & -0.004  (0) & 0.002  (0) & 0.014  (0) & 0.003  (0) & -0.004  (0) & (0) \\  \hline
+Sum & (0.001) & (0.001) & (0.002) & (0.001) & (0.001) & (0.003) & (0.005) &  (0.0124)\\ 
+   \hline
+\end{tabular}
+\caption{$\chi^2$--summary Quetelet index over \texttt{channel} and \texttt{weekday}} \label{tbl:quet_table_ch_week}
+\end{table}
 
 %</includetag>
 \end{document}
