@@ -6,11 +6,11 @@ library(xtable)
 set.seed(123)
 online.news.popularity <- read.csv(file="new_sample_OnlineNewsPopularity.csv",head=TRUE,sep=",")
 
-############################################# 
+#############################################
 ### 1. Build new nominal features         ###
-############################################# 
+#############################################
 
-channel <- online.news.popularity$data_channel_is_lifestyle + 
+channel <- online.news.popularity$data_channel_is_lifestyle +
   2*online.news.popularity$data_channel_is_entertainment + 3*online.news.popularity$data_channel_is_bus +
   4*online.news.popularity$data_channel_is_socmed + 5*online.news.popularity$data_channel_is_tech +
   6*online.news.popularity$data_channel_is_world
@@ -22,13 +22,20 @@ timegroup <- cut(online.news.popularity$timedelta, breaks = 4)
 data <- cbind(online.news.popularity, channel, weekday, timegroup)
 
 
-###################################### 
+######################################
 ### 2. Contingency tables          ###
-###################################### 
+######################################
 
-table(data$channel, data$timegroup)
-table(data$channel, data$weekday)
-table(data$weekday, data$timegroup)
+hannel_vs_timegroup_table <- table(data$channel, data$timegroup)
+channel_vs_weekday_table   <- table(data$channel, data$weekday)
+weekday_vs_timegroup_table <- table(data$weekday, data$timegroup)
+
+# relative frequencies tables
+addmargins(prop.table(channel_vs_timegroup_table)) * 100
+addmargins(prop.table(channel_vs_weekday_table)) * 100
+addmargins(prop.table(weekday_vs_timegroup_table)) * 100
+
+
 
 getQueteletIndex <- function(v1, v2) {
   size <- length(v1)
@@ -85,7 +92,7 @@ data <- data[sample(1:10000, size = 1000, replace = FALSE),]
 get_pretty_table_chi2(data$channel, data$timegroup)
 get_pretty_table_chi2(data$channel, data$weekday)
 
-################################################# 
+#################################################
 ### 4. Sufficient sample size for dependence  ###
 #################################################
 
