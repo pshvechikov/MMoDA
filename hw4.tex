@@ -69,9 +69,162 @@
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 %<*includetag>
-\section{Assignment 3.}
-
+\section{Assignment 4}
 \subsection{Selection and building nominal features}
+In our dataset we have several binary features, such as weekdays (\texttt{weekday\_is\_monday}, \texttt{weekday\_is\_tuesday} and so on) and belonging to one of the channels (\texttt{data\_channel\_is\_lifestyle}, \texttt{data\_channel\_is\_entertainment} and so on). Therefore we built two nominal features:
+\begin{itemize}
+\item channel: integer values ranging between 1 and 6 ('Lifestyle', 'Entertainment', 'Business', 'Social Media', 'Tech', 'World')
+\item weekday: integer values ranging between 1 and 7 
+\end{itemize}
+
+To obtain the third nominal feature we divide into four parts the feature \texttt{timedelta}: days between the article publication and the dataset acquisition.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}  
+\hlstd{timegroup} \hlkwb{<-} \hlkwa{cut}\hlstd{(data$timedelta, breaks = 4}
+\end{alltt}
+\end{kframe}
+\end{knitrout} 
+
+And we break range of values of \texttt{timedelta} into intervals: $(7.28,189]$, $(189,370]$, $(370,550]$, $(550,732]$
+
+\subsection{Contingency tables over features}
+Conditional frequency tables over introdused nominal fetures are obtained with R-function \texttt{table} as showned below and results are presented at Tables \ref{tbl:cont_table_ch_timed} -- \ref{tbl:cont_table_timed_week}.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}  
+table(data$channel, data$timegroup)
+table(data$channel, data$weekday)
+table(data$weekday, data$timegroup)
+\end{alltt}
+\end{kframe}
+\end{knitrout} 
+
+\begin{figure}[h]
+\begin{center}
+\begin{minipage}[h]{0.4\linewidth}
+\caption{Conditional frequency table over \texttt{channel} and \texttt{timegroup}} \label{tbl:cont_table_ch_timed}
+\begin{tabular}{|c|c|c|c|c|} 
+ \hline
+  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
+  0  &      412   &    327   &    361   &    381 \\ \hline
+  1  &      120   &     93   &    130   &    183 \\ \hline
+  2  &      573   &    473   &    341   &    348 \\ \hline
+  3  &      392   &    408   &    410   &    446 \\ \hline
+  4  &       81   &    154   &    163   &    192 \\ \hline
+  5  &      401   &    469   &    491   &    492 \\ \hline
+  6  &      901   &    564   &    373   &    321 \\ \hline
+\end{tabular}
+\end{minipage}
+\hfill 
+\begin{minipage}[h]{0.4\linewidth}
+\caption{Conditional frequency table over \texttt{channel} and \texttt{weekday}} \label{tbl:cont_table_ch_week}
+\begin{tabular}{|c|c|c|c|c|c|c|c|} 
+ \hline
+     &1 & 2 & 3 & 4 & 5 & 6 & 7 \\ \hline
+  0  & 224 & 256 &253 &257 &238 &112 &141 \\ \hline
+  1  & 80 & 95 &  92 & 85  &69  &46  &59 \\ \hline
+  2  & 317 & 332 & 311 & 287 & 241 & 95 & 152 \\ \hline
+  3  & 277 & 293 & 371 & 319 & 245 & 57 & 94 \\ \hline
+  4  & 88 & 116 &105& 115 & 88 & 44 & 34 \\ \hline
+  5  & 316 & 372 & 358 & 344 & 244 & 125 & 94\\ \hline
+  6  & 360& 379& 399& 392& 342& 136& 151 \\ \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\begin{minipage}[h]{0.4\linewidth}
+\caption{Conditional frequency table over \texttt{weekday} and \texttt{timegroup}} \label{tbl:cont_table_timed_week}
+\begin{tabular}{|c|c|c|c|c|} 
+ \hline
+  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
+  1&        492&       428  &     365   &    377 \\ \hline
+  2 &       564&       458  &     398   &    423 \\ \hline
+  3  &      513&       458  &     456   &    462 \\ \hline
+  4   &     495&       436  &     431   &    437 \\ \hline
+  5    &    444&       358  &     304   &    361 \\ \hline
+  6   &     181&       150  &     144   &    140 \\ \hline
+  7  &      191&       200  &     171   &    163 \\ \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+\end{figure}
+
+Quetelet relative index tables over our nominal fetures we obtain with the function:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}  
+getQueteletIndex \hlkwb{<-} \hlkwa{function}(v1, v2) {
+  size \hlkwb{<-} length(v1)
+  cont.table  \hlkwb{<-} table(v1, v2)
+  row.sums  \hlkwb{<-} rowSums(cont.table)
+  col.sums  \hlkwb{<-} colSums(cont.table)
+  norm.cont.table  \hlkwb{<-}  cont.table / size
+  norm.row.sums  \hlkwb{<-} row.sums / size
+  norm.col.sums  \hlkwb{<-} col.sums / size
+  list(Quetelet = norm.cont.table/(norm.row.sums%*% t(norm.col.sums)) - 1,
+       PearsonIndexMatrix = (-norm.row.sums%*%t(norm.col.sums)  + norm.cont.table )/sqrt(norm.row.sums%*%t(norm.col.sums)))
+}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+The results (in percent) are  presented at Tables . 
+\begin{figure}[h]
+\begin{center}
+\begin{minipage}[h]{0.4\linewidth}
+\caption{Quetelet relative index table over \texttt{channel} and \texttt{timegroup}} \label{tbl:quet_table_ch_timed}
+\begin{tabular}{|c|c|c|c|c|} 
+ \hline
+  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
+  0&      -3.41  &  -11.26&      7.43&      8.87 \\ \hline
+  1 &    -20.79  &  -28.94&      8.92&\textbf{47.23} \\ \hline
+  2  &14.67 &\textbf{9.57}&    -13.38&    -15.12 \\ \hline
+  3&     -17.81 &    -0.97&      9.12&     13.98 \\ \hline
+  4 &    -52.33 & 4.91&\textbf{21.76}&     37.72 \\ \hline
+  5  &   -24.86&      1.73&     16.78&     12.36 \\ \hline
+  6&\textbf{44.90}&   5.00&    -23.86&    -37.08 \\ \hline
+\end{tabular}
+\end{minipage}
+\hfill 
+\begin{minipage}[h]{0.5\linewidth}
+\caption{Quetelet relative index table over \texttt{channel} and \texttt{weekday}} \label{tbl:quet_table_ch_week}
+\begin{tabular}{|c|c|c|c|c|c|c|c|} 
+ \hline
+     &1 & 2 & 3 & 4 & 5 & 6 & 7 \\ \hline
+  0  &-9.00&  -6.21&  -9.57&  -3.54 &  9.54&  22.97&  31.32 \\ \hline
+  1 & -8.49&  -2.00&  -7.41& -10.17 &-10.58&\textbf{42.20}&\textbf{54.71}\\ \hline
+  2&\textbf{9.93}&   3.83&  -5.11&  -8.05 & -5.31& -10.97&  20.84 \\ \hline
+  3&   0.64&  -4.00&\textbf{18.60}&   7.08 &  0.85& -44.03& -21.71 \\ \hline
+  4& -10.26&   6.68&  -5.79&\textbf{8.35}&  1.67&  21.26& -20.51 \\ \hline
+  5&   2.61&\textbf{8.93}&   2.28&   3.19 &-10.24&   9.69& -30.03 \\ \hline
+  6&   0.33&  -4.75&  -2.17&   0.93 &\textbf{7.98}&   2.43&  -3.53 \\ \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\begin{minipage}[h]{0.4\linewidth}
+\caption{Quetelet relative index table over \texttt{weekday} and \texttt{timegroup}} \label{tbl:quet_table_timed_week}
+\begin{tabular}{|c|c|c|c|c|} 
+ \hline
+  &(7.28,189] &(189,370]& (370,550] &(550,732] \\ \hline
+  1 &      2.79 &     3.51  &   -3.21    & -4.01 \\ \hline
+  2&\textbf{6.26}&   -0.12  &   -4.82    & -2.87 \\ \hline
+  3 &     -5.70  &   -2.55&\textbf{6.39} &  3.50 \\ \hline
+  4 &     -4.46  &   -2.59  &    5.59    &  2.80 \\ \hline
+  5 &      5.09  &   -1.92  &   -8.67    &\textbf{4.14} \\ \hline
+  6 &      2.19  &   -1.97   &   3.19    & -3.66 \\ \hline
+  7 &   -8.52&\textbf{10.88}&    3.95    & -4.86 \\ \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+\end{figure}
 
 %</includetag>
 \end{document}
