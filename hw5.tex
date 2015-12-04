@@ -1,0 +1,100 @@
+\section{Assignment 5}
+\subsection{Multiple linear regression}
+
+As a target feature we will take a \texttt{num\_hrefs}: number of links of article, and we will determine via procedure of stepwise regression the features that influence strongly on the target. 
+
+But before, judge from constructed histograms of all dataset features, we took the logarithms of some of them, which probably have a lognormal distribution. So features \texttt{num\_hrefs}, \texttt{num\_self\_hrefs}, \texttt{shares}, \texttt{n\_tokens\_content}, \texttt{self\_reference\_avg\_sharess} were replaced by respective logarithms. 
+
+In the code below is shown how we used the bidirectional stepwise regression.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{min.model} \hlkwb{<-} \hlkwd{lm}\hlstd{(num_hrefs} ~ \hlnum{1}\hlstd{,} \hlkwc{data}\hlstd{= data}\hlstd{)}
+\hlstd{max.model} \hlkwb{<-} \hlkwd{lm}\hlstd{(num_hrefs} ~\hlstd{.,} \hlkwc{data} = data\hlstd{)}
+\hlstd{bidir.model} \hlkwb{<-} \hlkwd{step}\hlstd{(min.model,}  \hlkwc{scope} \hlstd{=} list(upper=max.model)\hlstd{,} 
+		\hlkwc{data} = data, \hlkwc{direction} = "both", \hlkwc{trace} = \hlnum{0}\hlstd{)}
+\hlkwd{summary}\hlstd{(bidir.model))}
+## Call:
+## lm(formula = num_hrefs ~ n_tokens_content + num_self_hrefs + 
+##     n_unique_tokens + num_keywords + num_imgs + timedelta + data_channel_is_socmed + 
+##     weekday_is_sunday + average_token_length + avg_negative_polarity + 
+##     global_sentiment_polarity + title_sentiment_polarity, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3913.8   -14.1     2.4    22.6   210.7 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               -4.477e+01  3.981e+01  -1.125 0.260700    
+## n_tokens_content           9.672e-01  1.043e-02  92.718  < 2e-16 ***
+## num_self_hrefs             3.122e-02  1.791e-03  17.431  < 2e-16 ***
+## n_unique_tokens           -1.786e+02  2.336e+01  -7.646 2.27e-14 ***
+## num_keywords               5.126e+00  1.149e+00   4.463 8.18e-06 ***
+## num_imgs                  -1.052e+00  2.824e-01  -3.726 0.000196 ***
+## timedelta                  4.165e-02  1.049e-02   3.972 7.19e-05 ***
+## data_channel_is_socmed    -3.248e+01  9.215e+00  -3.525 0.000425 ***
+## weekday_is_sunday         -2.421e+01  8.329e+00  -2.906 0.003664 ** 
+## average_token_length       1.734e+01  7.884e+00   2.200 0.027858 *  
+## avg_negative_polarity     -3.797e+01  1.906e+01  -1.992 0.046349 *  
+## global_sentiment_polarity  4.546e+01  2.524e+01   1.801 0.071707 .  
+## title_sentiment_polarity  -1.255e+01  8.165e+00  -1.537 0.124417    
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+## 
+## Residual standard error: 214.9 on 9987 degrees of freedom
+## Multiple R-squared:  0.9044,	Adjusted R-squared:  0.9043 
+## F-statistic:  7877 on 12 and 9987 DF,  p-value: < 2.2e-16
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+To obtain the standardized data we determine the function \texttt{normalize}, which subtract from element of vector its mid-range and divide them by half-range. The multiple linear regression relating standardized features, which were analogously chosen due to bidirectional stepwise regression, to standardized target \texttt{num\_hrefs}. 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+## data.nlm - standardized data
+\hlstd{data.nrm} \hlkwb{<-} \hlkwd{as.data.frame}(\hlkwd{apply}(data, \hlkwc{MARGIN} = \hlnum{2}, normalize))
+
+\hlstd{min.model.nrm} \hlkwb{<-} \hlkwd{lm}(num_hrefs~\hlnum{1}, \hlkwc{data} =data.nrm)
+\hlstd{max.model.nrm} \hlkwb{<-} \hlkwd{lm}(num_hrefs~., \hlkwc{data}=data.nrm)
+\hlstd{bidir.model.nrm} \hlkwb{<-} \hlkwd{step}(min.model.nrm,  \hlkwc{scope} = list(upper=max.model.nrm), 
+\hlkwc{data} = data.nrm, \hlkwc{direction} = "both", \hlkwc{trace} = \hlnum{0})
+\hlkwd{summary}\hlstd{(bidir.model.nrm))}
+## Call:
+## lm(formula = num_hrefs ~ n_tokens_content + num_self_hrefs + 
+##     n_unique_tokens + num_keywords + num_imgs + timedelta + data_channel_is_socmed + 
+##     weekday_is_sunday + average_token_length + avg_negative_polarity + 
+##     global_sentiment_polarity + title_sentiment_polarity, data = data.nrm)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.95444 -0.00706  0.00120  0.01128  0.10521 
+## 
+## Coefficients:
+##                            Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               -0.045000   0.011792  -3.816 0.000136 ***
+## n_tokens_content           0.968096   0.010441  92.718  < 2e-16 ***
+## num_self_hrefs             0.031221   0.001791  17.431  < 2e-16 ***
+## n_unique_tokens           -0.043680   0.005713  -7.646 2.27e-14 ***
+## num_keywords               0.011519   0.002581   4.463 8.18e-06 ***
+## num_imgs                  -0.033631   0.009027  -3.726 0.000196 ***
+## timedelta                  0.007519   0.001893   3.972 7.19e-05 ***
+## data_channel_is_socmed    -0.008111   0.002301  -3.525 0.000425 ***
+## weekday_is_sunday         -0.006044   0.002080  -2.906 0.003664 ** 
+## average_token_length       0.031257   0.014210   2.200 0.027858 *  
+## avg_negative_polarity     -0.009482   0.004759  -1.992 0.046349 *  
+## global_sentiment_polarity  0.012577   0.006983   1.801 0.071707 .  
+## title_sentiment_polarity  -0.006265   0.004077  -1.537 0.124417    
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+## 
+## Residual standard error: 0.1073 on 9987 degrees of freedom
+## Multiple R-squared:  0.9044,	Adjusted R-squared:  0.9043 
+## F-statistic:  7877 on 12 and 9987 DF,  p-value: < 2.2e-16
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+From summarizations we can see that in both cases the most influencing features, $R^2$ and F-statistic are the same, and the only characteristics which were changed are the value of coefficients. This can be explained by the procedure of standardization: it changes the scale of features, but relations between them remain the same.
