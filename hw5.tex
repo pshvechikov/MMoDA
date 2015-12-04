@@ -98,3 +98,32 @@ To obtain the standardized data we determine the function \texttt{normalize}, wh
 \end{knitrout}
 
 From summarizations we can see that in both cases the most influencing features, $R^2$ and F-statistic are the same, and the only characteristics which were changed are the value of coefficients. This can be explained by the procedure of standardization: it changes the scale of features, but relations between them remain the same.
+
+\subsection{Bootstrap for determinacy coefficient}
+The determinacy coefficient $R^2$ and adjusted $R^2$ of described above multiple linear regression are equal to $0.9044$ and $0.9043$ respectively. To 
+
+To estimate the 95\%  confidence interval of determinacy coefficient (adjusted) we realize the bootstrap method with 5000 trials. The resultant histogram is represented at Figure \ref{fig:hist_r_squared_bootstrap_assign5}. 
+
+\begin{figure}[h!]
+ \begin{center}
+    \center \includegraphics[width = 0.7\textwidth]{hist_r_squared_assign5.png}
+   \caption{Histogram of adjusted determinacy coefficients $R^2$ in multiple linear regression with target feature \texttt{$\log$(num\_hrefs)}}
+   \label{fig:hist_r_squared_bootstrap_assign5}
+ \end{center}
+\end{figure} 
+
+How we can see at histogram, the distribution is unlikely similar to normal, therefore we compute non-pivotal confidence interval for $R^2$:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+alpha \hlkwb{<-} \hlnum{0.95} # Confidence level
+# r2 --- sample of adjusted determinacy coefficients
+CI_R2 \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{quantile}\hlstd{(r2, }\hlkwc{probs}\hlstd{ = (}\hlnum{1} \hlopt{-} alpha)\hlopt{/}\hlnum{2}), 
+           \hlkwd{quantile}\hlstd{(r2, }\hlkwc{probs} \hlstd{= (}\hlnum{1} \hlopt{+} alpha)\hlopt{/}\hlnum{1}))
+##      2.5%     97.5% 
+## 0.7975380 0.9999989 
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+The determinacy coefficient from initial model $R^2_{adj} = 0.9043$ is closer to the right border, but holds within the interval. 
