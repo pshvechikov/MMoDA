@@ -1,6 +1,5 @@
 \section{Assignment 5}
 \subsection{Multiple linear regression}
-
 As a target feature we will take a \texttt{num\_hrefs}: number of links of article, and we will determine via procedure of stepwise regression the features that influence strongly on the target. 
 
 But before, judge from constructed histograms of all dataset features, we took the logarithms of some of them, which probably have a lognormal distribution. So features \texttt{num\_hrefs}, \texttt{num\_self\_hrefs}, \texttt{shares}, \texttt{n\_tokens\_content}, \texttt{self\_reference\_avg\_sharess} were replaced by respective logarithms. 
@@ -127,3 +126,14 @@ CI_R2 \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{quantile}\hlstd{(r2, }\hlkwc{probs}\hl
 \end{knitrout}
 
 The determinacy coefficient from initial model $R^2_{adj} = 0.9043$ is closer to the right border, but holds within the interval. 
+
+\subsection{Linear and Fisher discriminant rules}
+We applied z-score standardization our data and tried to grouped it regarding to "emotional" overtone, which is specified with such features as \texttt{global\_sentiment\_polarity}, \texttt{global\_rate\_positive\_words}, \texttt{global\_rate\_negative\_words}, \texttt{rate\_positive\_words} and \texttt{rate\_negative\_words}. We consider that overtone of the context of the article is called positive iff all of above features are strictly greater than zero, it's called negative iff above features are strictly less than zero and neutral overwise. We will discuss only well-separable classes: positive and negative overtones of the contexts. Projection all of the data features to the subspace of emotional context overtone, which was obtain with two first principal components, is shown at Figure \ref{fig:svd_to_positive_negarive_contexts_assign5}. 
+
+\begin{figure}[h!]
+ \begin{center}
+    \center \includegraphics[width = 0.7\textwidth]{pos_neg_rate_hw5.png}
+   \caption{Projection all of the data features to the subspace of emotional context overtone:}
+   \label{fig:svd_to_positive_negarive_contexts_assign5}
+ \end{center}
+\end{figure} 
