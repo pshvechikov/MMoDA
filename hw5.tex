@@ -149,4 +149,69 @@ CI_R2 \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{quantile}\hlstd{(r2, }\hlkwc{probs}\hl
 \end{kframe}
 \end{knitrout}
 
-The determinacy coefficient from initial model $R^2_{adj} = 0.9043$ is closer to the right border, but holds within the interval. 
+The determinacy coefficient from initial model $R^2_{adj} = 0.9043$ is closer to the right border, but lies within the interval. 
+
+
+\subsection{Linear and Fisher discriminant rules}
+In the third part of the fifths assignment one should divide the dataset into two groups, apply to both of them each of the discriminant rules (Linear, Fisher) and measure  accuracy of each of the models with the cross-validation techinque.
+
+So the first we had to do was to meaningfully choose the criterion by which to split our data in two parts. 
+To accomplish this task we have performed SVD decomposition and have figured out what feauture indexies  correspond to the most distant values of components of right eigenvector. As one can see in the Figures \ref{fig:svd_for_pca}--\ref{fig:svd_eigenvector} the most outstanding features in the first vector (which in turn corresponds to the most <<important>> first eigenvalue) are features with indexies 25, 26, 27, 28, 29. 
+
+That are the features with the following short titles: 
+
+ \texttt{global\_sentiment\_polarity},
+ 
+ 
+ \texttt{global\_rate\_positive\_words},
+ 
+ 
+ \texttt{global\_rate\_negative\_words},
+  \texttt{rate\_positive\_words},
+   \texttt{rate\_negative\_words}.    
+
+So we define a new feauture as a linear combinations of the features mentioned above and call it \texttt{label}. Obviously, this feature is about the mood of the article. We have also figured out that there are three types of sentiment each of the article posesses: positive, negative and mixed/undefined.
+
+
+
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}[h]{0.45\linewidth}
+\includegraphics[width=1\linewidth]{images/svd_for_pca}
+\caption{Singular values of a data matrix according to the SVD decomposition}
+\label{fig:svd_for_pca}
+\end{minipage}
+\hfill
+\begin{minipage}[h]{0.45\linewidth}
+	\centering
+	\includegraphics[width=1.00\linewidth]{images/svd_eigenvector}
+	\caption{Values of first right singular vector}
+	\label{fig:svd_eigenvector}
+\end{minipage}
+\end{figure}
+
+
+The best we can do to visualize this mood feature is to perfrom PCA projections on the 2d plane, which is presented in Figures \ref{fig:pca_projection_plot}--\ref{fig:pca_without_mixed}. 
+
+ 
+
+
+\begin{figure}[h!]
+	\centering
+	\begin{minipage}[h]{0.45\linewidth}
+	\includegraphics[width=1.1\linewidth]{images/pca_projection_plot}
+	\caption{Black circles corresponds to negative articles, red -- to the positive ones and green are associated with those, which are of the mixed mood.}
+	\label{fig:pca_projection_plot}
+	\end{minipage} 
+	\hfill
+	\begin{minipage}[h]{0.45\linewidth}
+	\includegraphics[width=1.1\linewidth]{images/pca_without_mixed}
+	\caption{PCA projection without neutral/mixed mood articles}
+	\label{fig:pca_without_mixed}
+	\end{minipage}
+\end{figure}
+
+After determining the splitting feature  we train two different algorithms  (Fisher / Linear discriminant rule) on the part of the data wich is determined with the $ 2- $ and  $10-$fold cross-validation techiques. 
+
+
