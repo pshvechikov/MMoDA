@@ -1,5 +1,5 @@
 library(lattice)
-library(car)
+library(e1071)
 set.seed(123)
 online.news.popularity <- read.csv(file="new_sample_OnlineNewsPopularity.csv",head=TRUE,sep=",")
 
@@ -67,5 +67,46 @@ mr$adj.r.squared
 #############################################
 ### 3. Linear, Fisher discriminant rule   ###
 #############################################
+
+n <- ncol(online.news.popularity)
+data <- online.news.popularity[,-c(1,2,n)]
+data <- subset(data, n_tokens_content > 0)
+
+data <- apply(data, MARGIN = 2,  function(x) {
+  y <- (x - mean(x))/sd(x)
+  y
+})
+
+s <- svd(data)
+u <- s$u[,1:2]
+v <- s$v[,1:2]
+X.proj <- data %*% v
+data <- data.frame(data)
+
+colnames(data)[25:29]
+# 1  -  strongly negative articles
+# 2  -  strongly positive articles
+# 3  -  neutral articles
+label <- ifelse(data[,25] < 0 & data[,26] < 0 & data[,27] > 0 & data[,28] < 0 & data[,29] > 0,1,
+        ifelse(data[,25] > 0 & data[,26] > 0 & data[,27] < 0 & data[,28] > 0 & data[,29] < 0, 2, 3))
+bad.index <- which(label == 3)
+
+plot(X.proj[-bad.index,1], X.proj[-bad.index,2], col = label[-bad.index])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
