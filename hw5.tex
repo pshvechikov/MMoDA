@@ -1,11 +1,33 @@
 \section{Assignment 5}
 \subsection{Multiple linear regression}
+The main task in the first part of the fifths assignment is to find the linear regression of the choosen target over the set of input features.
+We have choosen \texttt{num\_hrefs} as a target feature for building linear regression. That is the target feature  in our work is the  number of links that are in the particular article. 
 
-As a target feature we will take a \texttt{num\_hrefs}: number of links of article, and we will determine via procedure of stepwise regression the features that influence strongly on the target. 
+The first thing we did as a preprocessing step for the further analysis was to find all the feautres that seemed to be distributed lognormal and apply to them logarithm transformation.
+Example of such a transformation could be seen in the Figures \ref{fig:hist_of_ref_avg_shares}--\ref{fig:hist_log_self_ref_avg_shares}.
+ 
+ 
+\begin{figure}[h!]
+\centering
+\begin{minipage}[h]{0.45\linewidth}
+\includegraphics[width=1\linewidth]{images/hist_of_ref_avg_shares}
+\caption{Initial distribution of one of the features selected for logarithm transformation.}
+\label{fig:hist_of_ref_avg_shares}
+\end{minipage}
+\hfill
+\begin{minipage}[h]{0.45\linewidth}
+\includegraphics[width=1\linewidth]{images/hist_log_self_ref_avg_shares}
+\caption{Distribution of a feature after applying logarithm transformation.}
+\label{fig:hist_log_self_ref_avg_shares}
+\end{minipage}
+\end{figure}
 
-But before, judge from constructed histograms of all dataset features, we took the logarithms of some of them, which probably have a lognormal distribution. So features \texttt{num\_hrefs}, \texttt{num\_self\_hrefs}, \texttt{shares}, \texttt{n\_tokens\_content}, \texttt{self\_reference\_avg\_sharess} were replaced by respective logarithms. 
+Similarly we have transformed some other features, some of them are: \texttt{num\_hrefs}, \texttt{num\_self\_hrefs}, \texttt{shares}, \texttt{n\_tokens\_content}, \texttt{self\_reference\_avg\_sharess}.
 
-In the code below is shown how we used the bidirectional stepwise regression.
+
+The second step we took was applying the procedure of stepwise regression to find the set of the most influencing independent variables (aka regressors). The code snippet below shows how we have used the bidirectional stepwise regression regarding in the case of raw (unstandartized) data. 
+
+It is worth to mention that we have used the Akaike information criterion for selection the proper number of explanatory variables and the proper values of coefficients in linear regression model.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -50,7 +72,7 @@ In the code below is shown how we used the bidirectional stepwise regression.
 \end{kframe}
 \end{knitrout}
 
-To obtain the standardized data we determine the function \texttt{normalize}, which subtract from element of vector its mid-range and divide them by half-range. The multiple linear regression relating standardized features, which were analogously chosen due to bidirectional stepwise regression, to standardized target \texttt{num\_hrefs}. 
+To obtain the standardized data we define the function \texttt{normalize} as the subtraction from each element of a vector its mid-range and normalizing this difference by half-range of the possible values in that vector. The multiple linear regression results over standardized features,  which were chosen in the same manner as was described before -- by the bidirectional stepwise regression using  Akaike information, regarding to standardized dependent feature \texttt{num\_hrefs} is shown in the code snippet below. 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -97,12 +119,13 @@ To obtain the standardized data we determine the function \texttt{normalize}, wh
 \end{kframe}
 \end{knitrout}
 
-From summarizations we can see that in both cases the most influencing features, $R^2$ and F-statistic are the same, and the only characteristics which were changed are the value of coefficients. This can be explained by the procedure of standardization: it changes the scale of features, but relations between them remain the same.
+Comparing two outputs it is easy to see that nothing has changed except the absolute values of regression parameter  coefficients.
+Particularly, we can see that in both cases the most influencing features, $R^2$ and F-statistic are the same.  This can be explained by the procedure of standardization: it changes the scale of features, but all of the relations between them remain the same.  Here we can also highligh the fact that determinacy coefficient is an with respect to feautre scaling.
 
 \subsection{Bootstrap for determinacy coefficient}
-The determinacy coefficient $R^2$ and adjusted $R^2$ of described above multiple linear regression are equal to $0.9044$ and $0.9043$ respectively. To 
+The determinacy coefficients $R^2$ and adjusted $R^2$ of the multiple linear regression described above  are equal to $0.9044$ and $0.9043$ respectively. 
 
-To estimate the 95\%  confidence interval of determinacy coefficient (adjusted) we realize the bootstrap method with 5000 trials. The resultant histogram is represented at Figure \ref{fig:hist_r_squared_bootstrap_assign5}. 
+To estimate the 95\%  confidence interval of determinacy coefficient (adjusted) we have performed  the bootstrap  with 5000 trials. The resultant histogram is represented in Figure \ref{fig:hist_r_squared_bootstrap_assign5}. 
 
 \begin{figure}[h!]
  \begin{center}
@@ -112,7 +135,7 @@ To estimate the 95\%  confidence interval of determinacy coefficient (adjusted) 
  \end{center}
 \end{figure} 
 
-How we can see at histogram, the distribution is unlikely similar to normal, therefore we compute non-pivotal confidence interval for $R^2$:
+From the histogram one could see that the distribution is unlikely to be similar to normal (p-value is equal to $ 1.487\cdot 10^{-10} $ according to Shapiro-Wilk test of normality), therefore we compute non-pivotal confidence interval for $R^2$:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
