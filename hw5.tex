@@ -212,6 +212,30 @@ The best we can do to visualize this mood feature is to perfrom PCA projections 
 	\end{minipage}
 \end{figure}
 
-After determining the splitting feature  we train two different algorithms  (Fisher / Linear discriminant rule) on the part of the data wich is determined with the $ 2- $ and  $10-$fold cross-validation techiques. 
+After determining the splitting feature  we train two different algorithms  (Fisher / Linear discriminant rule) on the part of the data which is allocated by $2$- and  $10$-fold cross-validation techiques. 
+
+
+\begin{table}[h]
+\centering
+\label{tbl:fish_lin_disc}
+\caption{Fisher versus Linear Discriminant error rate}
+\begin{tabular}{|c|c|c|}
+	\hline  & Mean error with 2-folds & Mean error with 10-folds \\ 
+	\hline Linear Discriminant & 0.005575021  &  0.005342917 \\ 
+	\hline Fisher Discriminant  & 0.005110445   & 0.004645782  \\ 
+	\hline 
+\end{tabular} 
+\end{table} 
+
+The result we get is rather easy to explain. It is obvious that Fisher Discriminant Rule (FDR) is better no matter of what $ k $-fold is used. 
+
+From the theory we know that LDR has several assumptions of condition expectaions being distributed  normally. 
+
+FDR doesn't have such a assumption but in case theese probabilities are in fact normal, FDR and LDR are absolutely equal. So FDR is not at least worse than LDR. 
+
+For code and further details of implementation one could see attachements. 
+
+
+
 
 
