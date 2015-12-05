@@ -105,23 +105,17 @@ data$label <- as.factor(label)
 
 library(caret)
 
-getCVErrorLDA <- function(data, k) {
-  folds <- createFolds(y = 1:nrow(data), k = k)
+getCVErrorLDA <- function(data, folds) {
+  k = length(folds)
   cv.errors <- vector('numeric', k)
   for (i in 1:k) {
     test <- data[folds[[i]],]
     learning <- data[-folds[[i]],]
     fit <- lda(label~., learning)
-    cv.errors[i] <- sum(predict(fit, test)$class != test$label)
+    cv.errors[i] <- sum(predict(fit, test)$class != test$label) / length(folds[[i]])
   }
   cv.errors
 }
-
-getCVErrorLDA(data,10)
-getCVErrorLDA(data,2)
-
-
-
 
 getFisherVector <- function(data) {
   data$label <- as.numeric(data$label)
@@ -129,31 +123,43 @@ getFisherVector <- function(data) {
   sample1 <- subset(data, label == 1)[,-32]
   sample2 <- subset(data, label == 2)[,-32]
   W <- ( nrow(sample1) * cov(sample1) + nrow(sample2) * cov(sample2) ) / (nrow(data) - 2)
-  solve(W) %*% t(t(v))
+  vect <- solve(W) %*% t(t(v))
+  list(vect = vect, score = mean(c(sum(vect * colMeans(sample1)), sum(vect * sum(vect * colMeans(sample2))))))
 }
 
 predictFisherDA <- function(fisher_vector, element) {
-  ifelse(t(t(element)) %*% t(t(fisher_vector)) > 0, 1, 2)
+  ifelse(t(t(element)) %*% t(t(fisher_vector$vect)) > fisher_vector$score, 1, 2)
 }
 
-getCVErrorFisher <- function(data, k) {
-  folds <- createFolds(y = 1:nrow(data), k = k)
+getCVErrorFisher <- function(data, folds) {
+  k = length(folds)
   cv.errors <- vector('numeric', k)
   for (i in 1:k) {
     test <- data[folds[[i]],]
     learning <- data[-folds[[i]],]
     fit <- getFisherVector(learning)
-    cv.errors[i] <- sum(predictFisherDA(fit, test[,-32]) != test$label)
+    cv.errors[i] <- sum(predictFisherDA(fit, test[,-32]) != test$label) / length(folds[[i]])
   }
   cv.errors
 }
 
-getCVErrorFisher(data,10)
-getCVErrorFisher(data,2)
+
+folds <- createFolds(y = 1:nrow(data), k = 2)
+
+getCVErrorLDA(data,folds)
+getCVErrorFisher(data,folds)
+
+
+folds <- createFolds(y = 1:nrow(data), k = 10)
+
+mean(getCVErrorLDA(data,folds))
+mean(getCVErrorFisher(data,folds))
+
 
 ######################
 ### 0. PCA plots   ###
 ######################
+
 
 
 n <- ncol(online.news.popularity)
@@ -171,6 +177,7 @@ s <- svd(data)
 u <- s$u[,1:2]
 v <- s$v[,1:2]
 X.proj <- data %*% v
+plot(s$d)
 
 data <- data.frame(data)
 
