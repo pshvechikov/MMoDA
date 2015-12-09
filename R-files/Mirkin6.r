@@ -79,6 +79,7 @@ hf.std <- svd(data.nrm.std)$v[,1]
 plot(svd(data.nrm.std)$d)
 hf.range <- svd(data.nrm.range)$v[,1]
 plot(svd(data.nrm.range)$d)
+# Singular values show that the first vector is much more important than the others.
 
 
 hf.std <- abs(hf.std)
