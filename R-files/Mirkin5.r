@@ -117,6 +117,7 @@ getCVErrorLDA <- function(data, folds) {
   cv.errors
 }
 
+
 getFisherVector <- function(data) {
   data$label <- as.numeric(data$label)
   v <- -apply(aggregate(data, by = list(data$label), mean), 2, diff)[-c(1,33)]
@@ -124,7 +125,7 @@ getFisherVector <- function(data) {
   sample2 <- subset(data, label == 2)[,-32]
   W <- ( nrow(sample1) * cov(sample1) + nrow(sample2) * cov(sample2) ) / (nrow(data) - 2)
   vect <- solve(W) %*% t(t(v))
-  list(vect = vect, score = mean(c(sum(vect * colMeans(sample1)), sum(vect * sum(vect * colMeans(sample2))))))
+  list(vect = vect, score = mean(c(sum(vect * colMeans(sample1)), sum(vect * colMeans(sample2)))))
 }
 
 predictFisherDA <- function(fisher_vector, element) {
@@ -146,8 +147,8 @@ getCVErrorFisher <- function(data, folds) {
 
 folds <- createFolds(y = 1:nrow(data), k = 2)
 
-getCVErrorLDA(data,folds)
-getCVErrorFisher(data,folds)
+mean(getCVErrorLDA(data,folds))
+mean(getCVErrorFisher(data,folds))
 
 
 folds <- createFolds(y = 1:nrow(data), k = 10)
