@@ -77,36 +77,121 @@ data <- apply(data, MARGIN = 2,  function(x) {
   y
 })
 
-s <- svd(data)
-u <- s$u[,1:2]
-v <- s$v[,1:2]
-X.proj <- data %*% v
 data <- data.frame(data)
 
-colnames(data)[25:29]
-# 1  -  strongly negative articles
-# 2  -  strongly positive articles
-# 3  -  neutral articles
+# colnames(data)[25:29]
+# # 1  -  strongly negative articles
+# # 2  -  strongly positive articles
+# # 3  -  neutral articles
 label <- ifelse(data[,25] < 0 & data[,26] < 0 & data[,27] > 0 & data[,28] < 0 & data[,29] > 0,1,
         ifelse(data[,25] > 0 & data[,26] > 0 & data[,27] < 0 & data[,28] > 0 & data[,29] < 0, 2, 3))
 bad.index <- which(label == 3)
 
+# plot(X.proj[-bad.index,1], X.proj[-bad.index,2], col = label[-bad.index])
+
+data <- data[-bad.index,]
+label <- label[-bad.index]
+
+library(MASS)
+library(corrplot)
+
+lin_da <- lda(data, label)
+corrplot.mixed(cor(data))
+data <- data[,-c(24,28)]
+corrplot.mixed(cor(data))
+
+
+data$label <- as.factor(label)
+
+library(caret)
+
+getCVErrorLDA <- function(data, folds) {
+  k = length(folds)
+  cv.errors <- vector('numeric', k)
+  for (i in 1:k) {
+    test <- data[folds[[i]],]
+    learning <- data[-folds[[i]],]
+    fit <- lda(label~., learning)
+    cv.errors[i] <- sum(predict(fit, test)$class != test$label) / length(folds[[i]])
+  }
+  cv.errors
+}
+
+
+getFisherVector <- function(data) {
+  data$label <- as.numeric(data$label)
+  v <- -apply(aggregate(data, by = list(data$label), mean), 2, diff)[-c(1,33)]
+  sample1 <- subset(data, label == 1)[,-32]
+  sample2 <- subset(data, label == 2)[,-32]
+  W <- ( nrow(sample1) * cov(sample1) + nrow(sample2) * cov(sample2) ) / (nrow(data) - 2)
+  vect <- solve(W) %*% t(t(v))
+  list(vect = vect, score = mean(c(sum(vect * colMeans(sample1)), sum(vect * colMeans(sample2)))))
+}
+
+predictFisherDA <- function(fisher_vector, element) {
+  ifelse(t(t(element)) %*% t(t(fisher_vector$vect)) > fisher_vector$score, 1, 2)
+}
+
+getCVErrorFisher <- function(data, folds) {
+  k = length(folds)
+  cv.errors <- vector('numeric', k)
+  for (i in 1:k) {
+    test <- data[folds[[i]],]
+    learning <- data[-folds[[i]],]
+    fit <- getFisherVector(learning)
+    cv.errors[i] <- sum(predictFisherDA(fit, test[,-32]) != test$label) / length(folds[[i]])
+  }
+  cv.errors
+}
+
+
+folds <- createFolds(y = 1:nrow(data), k = 2)
+
+mean(getCVErrorLDA(data,folds))
+mean(getCVErrorFisher(data,folds))
+
+
+folds <- createFolds(y = 1:nrow(data), k = 10)
+
+mean(getCVErrorLDA(data,folds))
+mean(getCVErrorFisher(data,folds))
+
+
+######################
+### 0. PCA plots   ###
+######################
+
+
+
+n <- ncol(online.news.popularity)
+data <- online.news.popularity[,-c(1,2,n)]
+data <- subset(data, n_tokens_content > 0)
+
+data <- apply(data, MARGIN = 2,  function(x) {
+  y <- (x - mean(x))/sd(x)
+  y
+})
+
+data <- as.matrix(data)
+
+s <- svd(data)
+u <- s$u[,1:2]
+v <- s$v[,1:2]
+X.proj <- data %*% v
+plot(s$d)
+
+data <- data.frame(data)
+
+colnames(data)[25:29]
+# # 1  -  strongly negative articles
+# # 2  -  strongly positive articles
+# # 3  -  neutral articles
+label <- ifelse(data[,25] < 0 & data[,26] < 0 & data[,27] > 0 & data[,28] < 0 & data[,29] > 0,1,
+                ifelse(data[,25] > 0 & data[,26] > 0 & data[,27] < 0 & data[,28] > 0 & data[,29] < 0, 2, 3))
+bad.index <- which(label == 3)
+
+plot(X.proj[,1], X.proj[,2], col = label)
 plot(X.proj[-bad.index,1], X.proj[-bad.index,2], col = label[-bad.index])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

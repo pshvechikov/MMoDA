@@ -1,0 +1,18 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Assignment 1}{4}
+\contentsline {section}{\numberline {2}Assignment 2. Linear regression.}{8}
+\contentsline {subsection}{\numberline {2.1}Selection of features}{8}
+\contentsline {subsection}{\numberline {2.2}Model of linear regression}{10}
+\contentsline {subsection}{\numberline {2.3}Correlation and determinacy coefficients}{10}
+\contentsline {subsection}{\numberline {2.4}Bootstrap}{10}
+\contentsline {subsection}{\numberline {2.5}Average relative error}{12}
+\contentsline {subsection}{\numberline {2.6}Nature-inspired algorithm}{14}
+\contentsline {section}{\numberline {3}Assignment 4}{16}
+\contentsline {subsection}{\numberline {3.1}Selection and building nominal features}{16}
+\contentsline {subsection}{\numberline {3.2}Contingency tables over features}{16}
+\contentsline {subsection}{\numberline {3.3}$\chi ^2$--summary Quetelet index}{18}
+\contentsline {subsection}{\numberline {3.4}Sufficient sample size for result to be significant}{18}
+\contentsline {section}{\numberline {4}Assignment 5}{21}
+\contentsline {subsection}{\numberline {4.1}Multiple linear regression}{21}
+\contentsline {subsection}{\numberline {4.2}Bootstrap for determinacy coefficient}{22}
+\contentsline {subsection}{\numberline {4.3}Linear and Fisher discriminant rules}{23}
