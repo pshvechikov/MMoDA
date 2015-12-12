@@ -80,19 +80,29 @@ svd.std$v
 ### 3. Hidden factor                                  ###
 #########################################################
 
-hf.std <- svd(data.nrm.std)$v[,1]
+weigths.std <- svd(data.nrm.std)$v[,1]
 plot(svd(data.nrm.std)$d)
-hf.range <- svd(data.nrm.range)$v[,1]
+weigths.range <- svd(data.nrm.range)$v[,1]
 plot(svd(data.nrm.range)$d)
 # Singular values show that the first vector is much more important than the others.
 
+hf.std <- data.nrm.std %*% weigths.std
+head(hf.std)
+hf.range <- as.matrix(data.nrm.range) %*% weigths.range
+head(hf.range)
 
-hf.std <- abs(hf.std)
-hf.range <- abs(hf.range)
-hf.std <- hf.std / sum(hf.std) * 100
-hf.range <- hf.range / sum(hf.range) * 100
-hf <- data.frame(FeatureAbsoluteContribution = t(cbind(t(hf.std), t(hf.range))),
-                 StdType = c(rep("Std", 3), rep("Range", 3)),
-                 Feature = c("sentiment_polarity", "rate_positive_words", "rate_negative_words"))
-hf
-xyplot(FeatureAbsoluteContribution ~ Feature | StdType, data = hf, pch = 15)
+hf.std <- hf.std - min(hf.std)
+hf.range <- hf.range - min(hf.range)
+hf.std <- hf.std / max(hf.std) * 100
+hf.range <- hf.range / max(hf.range) * 100
+
+#Hidden factor for raw data
+weigths.raw <- svd(data)$v[,1]
+plot(svd(data)$d)
+hf.raw <- as.matrix(data) %*% weigths.raw
+head(hf.raw)
+
+hf.raw <- hf.raw - min(hf.raw)
+hf.raw <- hf.raw / max(hf.raw) * 100
+head(hf.raw)
+c(min(hf.raw),max(hf.raw)) # from 0 to 100! Perfecto!
