@@ -28,14 +28,14 @@ label <- ifelse(data[,25] < 0 & data[,26] < 0 & data[,27] > 0 & data[,28] < 0 & 
 bad.index <- which(label == 3)
 
 
-features <- c(25:27)
+features <- c(7,25,33)
 colnames(data)[features]
 n <- ncol(online.news.popularity)
 data <- online.news.popularity[,-c(1,2,n)]
 data <- subset(data, n_tokens_content > 0)
 
 data <- data[,features]
-
+data <- transform(data, shares = log(shares))
 #########################################################
 ### 2.Visualization (PCA)                             ###
 #########################################################
@@ -48,28 +48,33 @@ data.nrm.std <- scale(data, center = TRUE, scale = TRUE)
 #First normalization
 pca.std <- prcomp(data.nrm.std, center = FALSE, scale. = FALSE)
 biplot(pca.std)
-plot(pca.std$x[,1], pca.std$x[,2], col = label)
+plot(pca.std$x[,1], pca.std$x[,2], col = label, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Z-score')
 
 #Second normalization
 pca.range <- prcomp(data.nrm.range, center = FALSE, scale. = FALSE)
 biplot(pca.range)
-plot(pca.range$x[,1], -pca.range$x[,2], col = label)
+plot(pca.range$x[,1], pca.range$x[,2], col = label, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Range stardardization')
+
+svd.range <- svd(data.nrm.range)
+svd.range$v
+svd.std <- svd(data.nrm.std)
+svd.std$v
 
 # library(ggplot2)
 # pca.std <- as.data.frame(pca.std$x)
 # pca.range <- as.data.frame(pca.range$x)
 # 
-# ggplot(data = pca.std, aes(x = PC1, y = PC2, label = label))+
+# ggplot(data = pca.std, aes(x = PC1, y = PC2, label = rep('*',length(label))))+
 #   geom_hline(yintercept = 0, colour = "gray65") +
 #   geom_vline(xintercept = 0, colour = "gray65") +
 #   geom_text(colour = label, alpha = 0.8, size = 4) +
-#   ggtitle("PCA plot")
+#   ggtitle("PCA plot: Z-scoring")
 # 
-# ggplot(data = pca.range, aes(x = PC1, y = PC2, label = label))+
+# ggplot(data = pca.range, aes(x = PC1, y = PC2, label = rep('*',length(label))))+
 #   geom_hline(yintercept = 0, colour = "gray65") +
 #   geom_vline(xintercept = 0, colour = "gray65") +
 #   geom_text(colour = label, alpha = 0.8, size = 4) +
-#   ggtitle("PCA plot")
+#   ggtitle("PCA plot: Range standardization")
 
 #########################################################
 ### 3. Hidden factor                                  ###
