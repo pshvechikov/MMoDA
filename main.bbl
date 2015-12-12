@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+\def\selectlanguageifdefined#1{
+\expandafter\ifx\csname date#1\endcsname\relax
+\else\selectlanguage{#1}\fi}
+\providecommand*{\href}[2]{{\small #2}}
+\providecommand*{\url}[1]{{\small #1}}
+\providecommand*{\BibUrl}[1]{\url{#1}}
+\providecommand{\BibAnnote}[1]{}
+\providecommand*{\BibEmph}[1]{#1}
+\ProvideTextCommandDefault{\cyrdash}{\hbox to.8em{--\hss--}}
+\providecommand*{\BibDash}{\ifdim\lastskip>0pt\unskip\nobreak\hskip.2em\fi
+\cyrdash\hskip.2em\ignorespaces}
+
+\bibitem{median_sample}
+\selectlanguageifdefined{english}
+\BibEmph{Merberg~Adam, Miller~Steven~J.} The Sample Distribution of the Median.
+  \BibDash
+\newblock Course Notes for Math 162: Mathematical Statistics. \BibDash
+\newblock 2008. \BibDash feb.
+
+\bibitem{CCODA_Mirkin}
+\selectlanguageifdefined{english}
+\BibEmph{Mirkin~B.} Core Concepts in Data Analysis: Summarization, Correlation,
+  Visualization. \BibDash
+\newblock Springer, 2011. \BibDash
+\newblock ISBN:~\href{http://isbndb.com/search-all.html?kw=0857292862,
+  9780857292865}{0857292862, 9780857292865}.
+
+\end{thebibliography}
