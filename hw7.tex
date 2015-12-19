@@ -78,7 +78,8 @@ In order to find the optimum number of clusters, we have built plot
 As we can see from the plot, the optimal number of clusters is about 7 (or 8, if we want to divide left-bottom cluster into two parts).
 
 \subsection{Nearest Neighbor clustering with MST}
-	We will apply the k-nearest neighbourhood method on the same subset of initial data. To do this at first let's construct the Minimum Spanning Tree (aka MST further) of a complete, weighted and undirected graph, where entities of the dataset serve as vertexes. To compute the weight of each edge we found the distance between the every pair of vertexes. MST is presented in Figure \ref{fig:mst_whole}.
+
+	We applied the nearest neighbourhood method on the same subset of initial data. To do this at first let's construct the Minimum Spanning Tree (aka MST further) of a complete, weighted and undirected graph, where entities of the dataset serve as vertexes. To compute the weight of each edge we found the distance between the every pair of vertexes. MST is presented in Figure \ref{fig:mst_whole}.
 
 \begin{figure}[h]
 	\centering
@@ -89,7 +90,7 @@ As we can see from the plot, the optimal number of clusters is about 7 (or 8, if
 	\label{fig:mst_whole}	
 \end{figure}	
 	
-	From the resulting MST we will delete $k$ edges with the greatest weights to obtain graph with $k$ strongly connected components, and they form $k$ clusters. How one could see the clustering with $k=7$ is more natural for this example, so we will apply kNN method with $k = 7$ numbers of clusters as parameter. Graph included $7$ connected components and final clustering are presented in Figure \ref{fig:mst_whole_removed_heaviest} and in Figure \ref{fig:mst_clusters_splitted} respectively.
+	From the resulting MST we will delete $k-1$ edges with the greatest weights to obtain graph with $k$ strongly connected components to form $k$ clusters. How one could see the clustering with $k=7$ is more natural for this example, so we will apply kNN method with $k = 7$ numbers of clusters as parameter. Graph included $7$ connected components and final clustering are presented in Figure \ref{fig:mst_whole_removed_heaviest} and in Figure \ref{fig:mst_clusters_splitted} respectively.
 
 \begin{figure}[h]
 	\centering
@@ -109,7 +110,7 @@ As we can see from the plot, the optimal number of clusters is about 7 (or 8, if
 	\label{fig:mst_clusters_splitted}	
 \end{figure}	
 
-	To compare both method we will use mean the Silhouette Coefficient, which is calculated as $\frac{(b - a) }{\max(a, b)}$ where the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample.  The mean Silhouette Coefficient for K-Means wit $k = 7$ is equal to $0.44$ and for K-Nearest Neighbourhood method is equal to $0.01$. It may be not give enough information, but if compare two values above we can conclude that clustering better via K-Means method. But if we compare the difference of this indexes for each entity in both method, we can obtain that on average the Silhouette Coefficient k-means method is better.
+		To compare both method we will use mean the Silhouette Coefficient, which is calculated as $\frac{(b - a) }{\max(a, b)}$ where the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample.  The mean Silhouette Coefficient for K-Means wit $k = 7$ is equal to $0.44$ and for K-Nearest Neighbourhood method is equal to $0.01$. Thus we can conclude that clustering performance is better via K-Means method. 
 	
 
 
