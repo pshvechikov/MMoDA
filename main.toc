@@ -19,4 +19,12 @@
 \contentsline {section}{\numberline {5}Assignment 6}{26}
 \contentsline {subsection}{\numberline {5.1}Feature selection}{26}
 \contentsline {subsection}{\numberline {5.2}Visualization with PCA}{26}
-\contentsline {subsection}{\numberline {5.3}Hidden factor}{26}
+\contentsline {subsection}{\numberline {5.3}Hidden factor}{27}
+\contentsline {section}{\numberline {6}Assignment 7}{28}
+\contentsline {subsection}{\numberline {6.1}Feature selection}{28}
+\contentsline {subsection}{\numberline {6.2}K-Means Clustering}{28}
+\contentsline {subsection}{\numberline {6.3}Nearest Neighbor clustering with MST}{28}
+\select@language {english}
+\select@language {english}
+\select@language {english}
+\select@language {english}
