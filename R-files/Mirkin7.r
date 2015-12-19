@@ -5,9 +5,11 @@ set.seed(123)
 online.news.popularity <- read.csv(file="new_sample_OnlineNewsPopularity.csv",head=TRUE,sep=",")
 
 online.news.popularity$channel <- online.news.popularity$data_channel_is_lifestyle +
-                                              2*online.news.popularity$data_channel_is_entertainment + 3*online.news.popularity$data_channel_is_bus +
-                                              4*online.news.popularity$data_channel_is_socmed + 5*online.news.popularity$data_channel_is_tech +
-                                              6*online.news.popularity$data_channel_is_world
+                                  2*online.news.popularity$data_channel_is_entertainment +
+                                  3*online.news.popularity$data_channel_is_bus +
+                                  4*online.news.popularity$data_channel_is_socmed +
+                                  5*online.news.popularity$data_channel_is_tech +
+                                  6*online.news.popularity$data_channel_is_world
 
 online.news.popularity <- online.news.popularity[,-c(1,2,36)]
 
@@ -64,6 +66,20 @@ plot(pca.std$x[,1], pca.std$x[,2], col = k_mean_4$cluster, xlab = 'PCA 1', ylab 
 k_mean_7 <- km(data, 7, 20)
 pca.std <- prcomp(data, center = FALSE, scale. = FALSE)
 plot(pca.std$x[,1], pca.std$x[,2], col = k_mean_7$cluster, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Z-score')
+
+
+get_errors_for_list_of_k <- function(data, max_iter, k_range) {
+  return (sapply(k_range,
+                 function(k)
+                    return(km(data, k, max_iter)$tot.withinss)
+                 )
+          )
+}
+
+plot(get_errors_for_list_of_k(data, 50, 1:20),
+     main="Least squares errors",
+     xlab="different k",
+     ylab="within-cluster sum of squares")
 
 
 ##########################
