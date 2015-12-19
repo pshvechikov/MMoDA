@@ -45,7 +45,7 @@ features_to_cluster <- hrefs_and_images_features
 features_to_cluster <- channel_feature
 features_to_cluster <- num_of_words_feautures
 features_to_cluster <- polarity_features
-features_to_cluster <- c(channel_feature, num_of_words_feautures)
+features_to_cluster <- c(channel_feature, num_of_words_feautures, 34)
 
 colnames(data.nrm)[features_to_cluster]
 data <- data.nrm[ind, features_to_cluster]
