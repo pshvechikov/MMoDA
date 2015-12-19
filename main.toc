@@ -23,7 +23,7 @@
 \contentsline {section}{\numberline {6}Assignment 7}{28}
 \contentsline {subsection}{\numberline {6.1}Feature selection}{28}
 \contentsline {subsection}{\numberline {6.2}K-Means Clustering}{28}
-\contentsline {subsection}{\numberline {6.3}Nearest Neighbor clustering with MST}{28}
+\contentsline {subsection}{\numberline {6.3}Nearest Neighbor clustering with MST}{29}
 \select@language {english}
 \select@language {english}
 \select@language {english}
