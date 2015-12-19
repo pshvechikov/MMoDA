@@ -50,17 +50,25 @@ features_to_cluster <- c(channel_feature, num_of_words_feautures, 34)
 colnames(data.nrm)[features_to_cluster]
 data <- data.nrm[ind, features_to_cluster]
 
+xyplot(pca.std$x[,1] ~ pca.std$x[,2], xlab = 'PCA 1', ylab = 'PCA 2',
+       main = 'PCA plot')
+
 k_mean_3 <- kmeans(data, 3, nstart = 100)
 pca.std <- prcomp(data, center = FALSE, scale. = FALSE)
-plot(pca.std$x[,1], pca.std$x[,2], col = k_mean_3$cluster, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Z-score')
+xyplot(pca.std$x[,1] ~ pca.std$x[,2], col = k_mean_3$cluster, xlab = 'PCA 1', ylab = 'PCA 2',
+       main = 'PCA - K-Means. K = 3')
      
 k_mean_4 <- kmeans(data, 4, nstart = 100)
 pca.std <- prcomp(data, center = FALSE, scale. = FALSE)
-plot(pca.std$x[,1], pca.std$x[,2], col = k_mean_4$cluster, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Z-score')
+xyplot(pca.std$x[,1] ~ pca.std$x[,2], col = k_mean_4$cluster, xlab = 'PCA 1', ylab = 'PCA 2',
+       main = 'PCA - K-Means. K = 4')
+
 
 k_mean_7 <- kmeans(data, 7, nstart = 100)
 pca.std <- prcomp(data, center = FALSE, scale. = FALSE)
-plot(pca.std$x[,1], pca.std$x[,2], col = k_mean_7$cluster, xlab = 'PCA 1', ylab = 'PCA 2', main = 'PCA: Z-score')
+xyplot(pca.std$x[,1] ~ pca.std$x[,2], col = k_mean_7$cluster, xlab = 'PCA 1', ylab = 'PCA 2',
+     main = 'PCA - K-Means. K = 7')
+
 
 get_errors_for_list_of_k <- function(data, max_iter, k_range) {
   return (sapply(k_range,
@@ -70,14 +78,13 @@ get_errors_for_list_of_k <- function(data, max_iter, k_range) {
           )
 }
 
-plot(get_errors_for_list_of_k(data, 50, 1:20),
+xyplot(get_errors_for_list_of_k(data, 50, 1:20) ~ 1:20, 
      main="Least squares errors",
      xlab="different k",
-     ylab="within-cluster sum of squares")
+     ylab="within-cluster sum of squares", pch = 16)
 
 s <- silhouette(x = list(data = data, clustering = as.vector(k_mean_7$cluster)),
                 dist = dist(data))
-plot(sortSilhouette(s))
 
 
 ##########################
@@ -85,21 +92,22 @@ plot(sortSilhouette(s))
 ##########################
 
 library('igraph')
-data <- online.news.popularity[c("n_tokens_title", "num_hrefs")]
-features_to_cluster <- c("global_sentiment_polarity" , "global_rate_positive_words", 
-                         "global_rate_negative_words", "rate_positive_words", 
-                         "rate_negative_words", "avg_positive_polarity", 
-                         "avg_negative_polarity", "title_sentiment_polarity" )
-data <- online.news.popularity[features_to_cluster]
-data.nrm_range <- data[sample(1:nrow(data), 500), ]
-data.nrm_range <- as.data.frame(apply(data.nrm_range, MARGIN = 2, scale)) 
+# data <- online.news.popularity[c("n_tokens_title", "num_hrefs")]
+# features_to_cluster <- c("global_sentiment_polarity" , "global_rate_positive_words", 
+#                          "global_rate_negative_words", "rate_positive_words", 
+#                          "rate_negative_words", "avg_positive_polarity", 
+#                          "avg_negative_polarity", "title_sentiment_polarity" )
+# data <- online.news.popularity[features_to_cluster]
+# data.nrm_range <- data[sample(1:nrow(data), 500), ]
+# data.nrm_range <- as.data.frame(apply(data.nrm_range, MARGIN = 2, scale)) 
+data.nrm_range <- data
 weighted_adjacency_matrix <- as.matrix(dist(data.nrm_range))
 graph <- graph_from_adjacency_matrix(weighted_adjacency_matrix, weighted = T)
 mst_res <- mst(graph, weights = graph$weighted, algorithm = 'prim')
 plot(mst_res, edge.label=round(E(mst_res)$weight, 1))
 
 mst_edges <- E(mst_res)$weight
-k <- 3
+k <- 7
 heaviest_edges <- which(mst_edges >= sort(mst_edges, decreasing=T)[k-1])
 mst_edges[heaviest_edges]
 
