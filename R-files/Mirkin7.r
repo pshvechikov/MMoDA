@@ -36,7 +36,7 @@ data.nrm <- scale(data)
 #########################################################
 
 
-ind <- sample(1:nrow(data.nrm), 500)
+ind <- sample(1:nrow(data.nrm), 1000)
 polarity_features <- c(25:32)
 num_of_words_feautures <- c(2:4, 9:10)
 channel_feature <- c(11:16)
@@ -105,7 +105,7 @@ mst_res <- mst(graph, weights = graph$weighted, algorithm = 'prim')
 #            vertex.label=NA, vertex.size=5,  rescale=T)
 
 pdf ('../images/mst_whole', width=100 , height=80)
-plot.igraph(mst_res, vertex.label=NA, vertex.size=5, layout=lo)
+plot.igraph(mst_res, vertex.label=NA, vertex.size=4, layout=lo)
 dev.off()
 
 mst_edges <- E(mst_res)$weight
@@ -116,12 +116,12 @@ mst_res <- delete_edges(mst_res, E(mst_res)[heaviest_edges_index])
 
 V(graph)$color <- rainbow(ncomp)[components(mst_res)$membership]
 pdf ('../images/mst_whole_removed_most_heaviest', width=100 , height=80)
-plot.igraph(mst_res, vertex.label=NA, vertex.size=5, layout=lo, vertex.color=components(mst_res)$membership)
+plot.igraph(mst_res, vertex.label=NA, vertex.size=4, layout=lo, vertex.color=components(mst_res)$membership)
 dev.off()
 
 
 pdf ('../images/mst_clusters_splitted', width=100 , height=80)
-plot (mst_res,  vertex.size=6, vertex.label=NA, layout=lo,
+plot (mst_res,  vertex.size=4, vertex.label=NA, layout=lo,
       mark.groups = split(1:vcount(graph), components(mst_res)$membership))
 dev.off()
 
