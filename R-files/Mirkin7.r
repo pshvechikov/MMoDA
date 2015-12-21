@@ -87,6 +87,35 @@ xyplot(get_errors_for_list_of_k(data, 50, 1:20) ~ 1:20,
      xlab="different k",
      ylab="within-cluster sum of squares", pch = 16)
 
+WS <- get_errors_for_list_of_k(data, 50, 1:20)
+c <- list()
+for (i in 1:19) {
+  wslist[[i]] <- (WS[i] / WS[i+1] - 1) * (nrow(data) - i - 1) 
+}
+plot(as.numeric(wslist), ylab="Hartigan’s Index value", 
+     xlab="different k", main="Hartigan’s Index")
+
+
+
+get_silhoulette_of_k <- function(data, max_iter, k_range) {
+  return (sapply(k_range,
+                 function(k) {
+                   k_mean_k <- kmeans(data, k, nstart = max_iter)
+                   s <- silhouette(x = list(data = data, clustering = as.vector(k_mean_k$cluster)),
+                              dist = dist(data))
+                   mean(as.matrix(s)[, 3])
+                 })
+  )
+}                   
+                     
+
+xyplot(get_silhoulette_of_k(data, 50, 2:20) ~ 2:20,
+       main="Silhoulette index",
+       xlab="different k",
+       ylab="value of mean Silhoulette index",  pch = 16)
+
+
+
 s <- silhouette(x = list(data = data, clustering = as.vector(k_mean_7$cluster)),
                 dist = dist(data))
 
